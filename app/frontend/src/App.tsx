@@ -5,9 +5,7 @@ import { useAuthStore } from './stores';
 import {
   LoginPage,
   RegisterPage,
-  DashboardPage,
-  TeamsPage,
-  BillingPage,
+  ChatPage,
   SettingsPage,
 } from './pages';
 
@@ -46,23 +44,21 @@ function AppRoutes() {
       {/* Public routes */}
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+        element={isAuthenticated ? <Navigate to="/chat" replace /> : <LoginPage />}
       />
       <Route
         path="/register"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <RegisterPage />}
+        element={isAuthenticated ? <Navigate to="/chat" replace /> : <RegisterPage />}
       />
 
       {/* Protected routes */}
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/teams" element={<TeamsPage />} />
-      <Route path="/billing" element={<BillingPage />} />
+      <Route path="/chat" element={<ChatPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/settings/:tab" element={<SettingsPage />} />
 
       {/* Redirects */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Navigate to="/chat" replace />} />
+      <Route path="*" element={<Navigate to="/chat" replace />} />
     </Routes>
   );
 }

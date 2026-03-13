@@ -22,7 +22,7 @@ Safely build, deploy, and validate a release to a target environment. The Deploy
 
 | Agent | Writable Paths |
 |-------|----------------|
-| Deployer | `platform/infrastructure/`, deployment configs, build artifacts |
+| Deployer | `platform/`, deployment configs, build artifacts |
 | Validator | `tests/e2e/`, monitoring/validation scripts |
 
 No overlap — Deployer owns infrastructure, Validator owns validation tests.
@@ -77,9 +77,9 @@ Validator ── signals failure ──→ Deployer (rollback)
 > If any step fails, message the Validator immediately and halt.
 > If the Validator reports validation failures, execute ROLLBACK immediately.
 > After rollback, report what went wrong.
-> Owns: `platform/infrastructure/`, deployment configs, build artifacts.
+> Owns: `platform/`, deployment configs, build artifacts.
 
-**File ownership:** `platform/infrastructure/`, deployment configs
+**File ownership:** `platform/`, deployment configs
 
 ### 2. Validator
 **Spawn prompt:**

@@ -28,7 +28,7 @@ Design, implement, test, and review a complete feature across the full stack. Th
 
 | Agent | Writable Paths |
 |-------|----------------|
-| Architect | `docs/architecture.md`, `knowledge/architecture.md` |
+| Architect | `docs/architecture.md`, `docs/knowledge/architecture.md` |
 | Frontend | `apps/frontend/`, `saas-app/frontend/` |
 | Backend | `apps/backend/`, `apps/database/`, `saas-app/backend/` |
 | Tester | `tests/` |
@@ -79,7 +79,7 @@ Architect (plan approval required)
 > design to `docs/architecture.md`. Create an ADR if this involves a significant technical decision.
 > Do NOT modify any source code — design only.
 
-**File ownership:** `docs/architecture.md`, `knowledge/architecture.md`
+**File ownership:** `docs/architecture.md`, `docs/knowledge/architecture.md`
 **Model:** Claude Sonnet (high capability needed for design)
 **Plan approval:** REQUIRED — lead must approve before implementation begins
 

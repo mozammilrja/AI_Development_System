@@ -1,32 +1,127 @@
 # Deploy App Command
 
-Deploy the application: $ARGUMENTS
+Deploy the application: **$ARGUMENTS**
 
-Create an agent team with 2 teammates to handle deployment and validation in parallel.
+---
 
-Spawn these teammates:
+## Deployment Team
 
-1. **Deployer** — Execute the deployment pipeline:
-   - Run pre-deployment checks (lint, type-check, dependency audit)
-   - Build and package the application
-   - Deploy to the target environment (default: staging)
-   - Owns: `infrastructure/`, deployment configs
-   - If any step fails, message the Validator immediately and halt
-   - After successful deploy, message Validator to begin smoke tests
+Spawn these agents for deployment:
 
-2. **Validator** — Monitor and validate the deployment:
-   - Wait for Deployer to signal deployment is complete
-   - Run smoke tests against the deployed environment
-   - Check health endpoints and response times
-   - Verify critical user flows work end-to-end
-   - If validation fails, message Deployer to trigger ROLLBACK
-   - Owns: `tests/e2e/`, monitoring checks
+| # | Agent | Role | Owns |
+|---|-------|------|------|
+| 1 | **DevOps Engineer** | Execute deployment | `platform/`, `.github/` |
+| 2 | **QA Engineer** | Validate deployment | `tests/e2e/` |
+| 3 | **Security Engineer** | Security validation | `security/` |
 
-Rollback procedure:
-- If Validator reports failures, Deployer must rollback immediately
-- After rollback, both teammates report what went wrong
-- Lead synthesizes a deployment failure report
+---
 
-Default environment: staging. Default strategy: rolling.
+## Deployment Process
 
-Refer to `core/agents/teams/release_team.md` for the full team template.
+### Phase 1: Pre-Deployment (Parallel)
+
+```
+┌──────────────────┬──────────────────┬──────────────────┐
+│  DevOps          │  QA              │  Security        │
+│  - Build         │  - Prepare tests │  - Final audit   │
+│  - Package       │  - Setup env     │  - Scan deps     │
+└────────┬─────────┴────────┬─────────┴────────┬─────────┘
+         │                  │                   │
+         └──────────────────┴───────────────────┘
+                            │
+                      [All ready?]
+                            │
+                            ▼
+```
+
+### Phase 2: Deploy
+
+```
+┌─────────────────────────────────────────┐
+│            DevOps Engineer               │
+│  1. Deploy to target environment         │
+│  2. Wait for health checks               │
+│  3. Signal QA for validation             │
+└─────────────────────────────────────────┘
+```
+
+### Phase 3: Validation (Parallel)
+
+```
+┌──────────────────┬──────────────────┐
+│  QA Engineer     │  Security        │
+│  - Smoke tests   │  - Pen test      │
+│  - E2E tests     │  - Config audit  │
+│  - Health checks │  - TLS check     │
+└────────┬─────────┴────────┬─────────┘
+         │                  │
+         └──────────────────┘
+                 │
+           [Validation]
+                 │
+         ┌───────┴───────┐
+         │               │
+       PASS            FAIL
+         │               │
+         ▼               ▼
+    [Complete]      [Rollback]
+```
+
+---
+
+## Environment Options
+
+```
+/deploy-app --env staging     # Deploy to staging (default)
+/deploy-app --env production  # Deploy to production
+```
+
+---
+
+## Rollback
+
+If validation fails:
+1. DevOps Engineer triggers immediate rollback
+2. Previous version is restored
+3. Failure report is generated
+
+---
+
+## Success Criteria
+
+- All health endpoints return 200
+- Smoke tests pass
+- E2E critical paths work
+- No security vulnerabilities detected
+- Response times within targets
+
+---
+
+## Output
+
+Deployment report:
+
+```markdown
+# Deployment Report
+
+## Environment: [staging/production]
+## Status: [SUCCESS/FAILED/ROLLED_BACK]
+
+## Pre-Deployment
+- Build: ✓/✗
+- Security scan: ✓/✗
+
+## Deployment
+- Version: x.y.z
+- Started: [timestamp]
+- Completed: [timestamp]
+
+## Validation
+- Health checks: ✓/✗
+- Smoke tests: ✓/✗ (passed/total)
+- E2E tests: ✓/✗ (passed/total)
+- Security: ✓/✗
+
+## Issues
+[List any issues encountered]
+```

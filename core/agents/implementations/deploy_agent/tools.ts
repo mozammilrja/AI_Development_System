@@ -2,7 +2,7 @@ export const tools = {
   fileEditor: {
     name: 'file_editor',
     description: 'Edit infrastructure and deployment configs',
-    allowedPaths: ['platform/infrastructure/**', 'platform/environments/**'],
+    allowedPaths: ['platform/**', 'platform/environments/**'],
   },
 
   repoReader: {

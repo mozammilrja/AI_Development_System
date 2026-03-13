@@ -2,22 +2,31 @@
 
 export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'failed' | 'cancelled';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
+
+/** 10-agent autonomous team */
 export type AgentName =
+  | 'product-manager'
   | 'architect'
-  | 'planner'
-  | 'frontend'
-  | 'backend'
-  | 'tester'
-  | 'debugger'
-  | 'reviewer'
-  | 'security'
-  | 'devops'
-  | 'documentation'
-  | 'qa'
-  | 'ui-designer';
+  | 'backend-engineer'
+  | 'frontend-engineer'
+  | 'ui-designer'
+  | 'devops-engineer'
+  | 'security-engineer'
+  | 'qa-engineer'
+  | 'performance-engineer'
+  | 'code-reviewer';
 
 export type WorkflowType = 'development' | 'debug' | 'review' | 'release' | 'research';
-export type TeamPattern = 'sequential' | 'parallel' | 'sequential_parallel' | 'adversarial';
+export type TeamPattern = 'sequential' | 'parallel' | 'sequential_parallel' | 'adversarial' | 'autonomous_parallel' | 'phased_sequential';
+
+/** Phase definition for phased_sequential workflows */
+export interface WorkflowPhase {
+  name: string;
+  agents: AgentName[];
+  blocking: boolean;
+  parallel?: boolean;
+  requiresApproval?: boolean;
+}
 
 /** A single task within a workflow. */
 export interface Task {
@@ -68,6 +77,7 @@ export interface TeamTemplate {
   goal: string;
   members: AgentName[];
   pattern: TeamPattern;
+  phases?: WorkflowPhase[];
   taskFlow: string[];
 }
 

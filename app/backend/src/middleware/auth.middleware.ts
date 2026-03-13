@@ -28,3 +28,6 @@ export const restrictTo = (...roles: string[]) => {
     next();
   };
 };
+
+// Alias for compatibility
+export const authMiddleware = protect;

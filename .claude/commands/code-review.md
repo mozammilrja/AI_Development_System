@@ -1,43 +1,110 @@
 # Code Review Command
 
-Review the current changes using a multi-perspective team: $ARGUMENTS
+Review the current codebase: **$ARGUMENTS**
 
-Create an agent team with 3 reviewers, each focused on a different quality dimension. They work in PARALLEL — no dependencies between them.
+---
 
-Spawn these teammates:
+## Multi-Perspective Parallel Review
 
-1. **Security Reviewer** — Focus exclusively on security implications:
-   - Check for injection vulnerabilities (SQL, XSS, command injection)
-   - Review authentication and authorization logic
-   - Verify input validation and sanitization
-   - Check for secrets/credentials in code
-   - Review dependency versions for known CVEs
-   - Rate each finding: Critical / High / Medium / Low
-   - Read-only: do NOT edit source files
+This command spawns 4 specialized reviewers that work **in parallel** to provide comprehensive code review.
 
-2. **Performance Reviewer** — Focus exclusively on performance impact:
-   - Check for N+1 queries, unbounded loops, memory leaks
-   - Review async/await usage and concurrency patterns
-   - Identify unnecessary allocations or expensive operations
-   - Check caching opportunities
-   - Review database query efficiency
-   - Rate each finding: Critical / High / Medium / Low
-   - Read-only: do NOT edit source files
+---
 
-3. **Test Coverage Reviewer** — Focus exclusively on test adequacy:
-   - Run `pytest --cov` and analyze coverage reports
-   - Identify untested code paths and edge cases
-   - Check that error handling paths have tests
-   - Verify integration boundaries are tested
-   - Suggest specific test cases that should be added
-   - Rate each gap: Critical / High / Medium / Low
-   - Read-only: do NOT edit source files
+## Review Team
 
-All reviewers work in PARALLEL — they examine the same codebase independently with different lenses.
+Spawn all reviewers **simultaneously**:
 
-After all reviewers complete, synthesize findings:
-- Combined report organized by severity (Critical → Low)
-- Deduplicate overlapping findings
-- Prioritized action items for the developer
+| # | Reviewer | Focus Area | Writes To |
+|---|----------|------------|----------|
+| 1 | **Security Reviewer** | Security vulnerabilities, auth, data exposure | `reviews/security/` |
+| 2 | **Performance Reviewer** | Performance issues, bottlenecks | `reviews/tests/benchmarks/` |
+| 3 | **Quality Reviewer** | Code quality, patterns, maintainability | `reviews/quality/` |
+| 4 | **Test Reviewer** | Test coverage, test quality | `reviews/tests/` |
 
-Refer to `core/agents/teams/review_team.md` for the full team template.
+---
+
+## Review Focus Areas
+
+### Security Reviewer
+```
+- OWASP Top 10 vulnerabilities
+- SQL/NoSQL injection
+- XSS and CSRF
+- Authentication/authorization flaws
+- Secrets in code
+- Dependency vulnerabilities
+```
+
+### Performance Reviewer
+```
+- N+1 queries
+- Memory leaks
+- Unbounded loops
+- Inefficient algorithms
+- Caching opportunities
+- Bundle size issues
+```
+
+### Quality Reviewer
+```
+- Code style and conventions
+- Design patterns
+- SOLID principles
+- Error handling 
+- Documentation
+- Maintainability
+```
+
+### Test Reviewer
+```
+- Test coverage percentage
+- Untested edge cases
+- Test quality
+- Missing integration tests
+- E2E coverage
+```
+
+---
+
+## Severity Ratings
+
+| Severity | Description |
+|----------|-------------|
+| Critical | Must fix before deployment |
+| High | Should fix before deployment |
+| Medium | Should fix soon |
+| Low | Nice to fix |
+
+---
+
+## Output
+
+Each reviewer writes findings to their directory in `reviews/`.
+
+After all reviewers complete, generate `reviews/summary.md`:
+
+```markdown
+# Code Review Summary
+
+## Overview
+- Files reviewed: N
+- Total issues: N (N critical, N high, N medium, N low)
+
+## Findings by Category
+### Security (N issues)
+### Performance (N issues)
+### Quality (N issues)
+### Test Coverage (N issues)
+
+## Recommendation
+[APPROVED / APPROVED WITH RESERVATIONS / CHANGES REQUESTED]
+```
+
+---
+
+## Execution
+
+All reviewers work **in parallel** with NO dependencies:
+1. Each reviewer examines the codebase independently
+2. Findings are written to respective directories
+3. Summary is generated after all complete

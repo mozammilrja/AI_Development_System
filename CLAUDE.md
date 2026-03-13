@@ -2,105 +2,118 @@
 
 ## Overview
 
-A **multi-agent AI development system** that orchestrates specialized agents to automate software development workflows. Agents collaborate via Claude Code Agent Teams to build, test, review, and deploy applications in the `apps/` and `saas-app/` workspaces.
+A **fully autonomous multi-agent software engineering platform** where all agents work **independently and in parallel** to design, build, test, review, and deploy software. No sequential phases—agents collaborate asynchronously through repository updates.
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────┐
-│            Claude Code Agent Teams               │
-│        (multi-instance orchestration)           │
-├─────────────────────────────────────────────────┤
-│                 Agent Layer                      │
-│  architect · planner · frontend · backend        │
-│  ui-designer · qa · tester · security           │
-│  reviewer · debugger · devops · documentation   │
-├─────────────────────────────────────────────────┤
-│                Workflow Layer                    │
-│  feature · debug · review · release · research  │
-├─────────────────────────────────────────────────┤
-│               Knowledge Layer                    │
-│  knowledge/ · docs/ · .claude/                  │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    AUTONOMOUS PARALLEL EXECUTION                            │
+│                    (All Agents Start Immediately)                           │
+├──────────┬──────────┬──────────┬──────────┬──────────┬──────────────────────┤
+│ Architect│ Backend  │ Frontend │ Tester   │ Reviewer │     ...more          │
+│          │ Engineer │ Engineer │ (QA)     │          │                      │
+└──────────┴──────────┴──────────┴──────────┴──────────┴──────────────────────┘
+                                    │
+                    ┌───────────────┴───────────────┐
+                    │  Async Collaboration via Repo │
+                    └───────────────────────────────┘
 ```
 
-## Agent Roles
+## The Agent Team
 
 | Agent | Owns | Does |
 |-------|------|------|
-| **Architect** | `docs/architecture.md`, `knowledge/` | System design, ADRs, tech decisions |
-| **Planner** | `docs/tasks/` | Task breakdown, coordination |
-| **Frontend** | `apps/frontend/`, `saas-app/frontend/` | React/Next.js development |
-| **Backend** | `apps/backend/`, `saas-app/backend/` | API and service development |
-| **UI-Designer** | `docs/design/` | UI/UX design, design system |
-| **QA** | `tests/` | Test strategy, quality assurance |
-| **Tester** | `tests/` | Test implementation and execution |
-| **Security** | `docs/security/` | Security audits, vulnerability checks |
-| **Reviewer** | read-only | Code quality and review |
-| **Debugger** | cross-codebase | Bug analysis and fixes |
-| **DevOps** | `platform/infrastructure/` | CI/CD, deployment |
-| **Documentation** | `docs/`, `README.md` | Documentation |
+| **Architect** | `docs/architecture.md`, `docs/features/` | System design, API contracts |
+| **Backend Engineer** | `app/backend/` | APIs, services, database models |
+| **Frontend Engineer** | `app/frontend/` | React components, pages, client logic |
+| **QA Engineer** | `tests/` | Unit, integration, E2E tests |
+| **Performance Engineer** | `tests/benchmarks/` | Benchmarks, optimization |
+
+## Execution Model
+
+### Autonomous Parallel Execution
+
+All agents start **immediately** and work **independently**:
+
+1. **No Sequential Phases** — All agents begin at t=0
+2. **Independent Work** — Each agent works autonomously on their tasks
+3. **Async Collaboration** — Agents coordinate through repository file updates
+4. **Continuous Progress** — Agents monitor repo changes and adapt their work
+5. **Final Report** — Generated when all agents complete
 
 ## Directory Structure
 
 ```
-.agents/            — Agent role definitions (YAML)
-.claude/            — Claude Code config, commands, skills
-core/               — Orchestration logic
-  agents/           — Agent definitions, prompts, team templates
-  workflows/        — Workflow documentation
-configs/            — Configuration files
-docs/               — Documentation
-knowledge/          — Project knowledge base
-apps/               — Application workspace (frontend, backend, database)
-saas-app/           — SaaS application workspace
-platform/           — Infrastructure configs
+AI_DEVELOPMENT_SYSTEM/
+├── .agents/              # Agent definitions (YAML)
+├── .claude/              # Commands, skills, config
+├── app/                  # Application code
+│   ├── backend/          # Express.js backend
+│   └── frontend/         # React frontend
+├── configs/              # Configuration files
+├── core/                 # Orchestration engine
+│   ├── agents/           # Agent implementations & teams
+│   ├── orchestrator/     # Agent runner
+│   ├── services/         # Team launcher
+│   └── workflows/        # Workflow definitions
+├── docs/                 # Documentation
+│   ├── features/         # Feature docs (organized by feature)
+│   ├── chat-app/         # Chat app specifications
+│   └── knowledge/        # Knowledge base & guides
+├── platform/             # Infrastructure
+│   ├── docker/           # Dockerfile, docker-compose
+│   └── terraform/        # Terraform configs
+└── tests/                # All tests
+    ├── benchmarks/       # Performance benchmarks
+    ├── e2e/              # End-to-end tests
+    ├── integration/      # Integration tests
+    ├── security/         # Security tests
+    └── unit/             # Unit tests
 ```
-
-## Team Patterns
-
-| Team | Pattern | Command |
-|------|---------|---------|
-| **Feature** | architect → planner → frontend + backend → qa → reviewer | `/build-feature` |
-| **Debug** | 3 competing investigators → synthesis | `/debug-bug` |
-| **Review** | security + quality + coverage (parallel) | `/code-review` |
-| **Release** | devops → qa validation → deploy | `/deploy-app` |
-| **Research** | proponent + critic + evaluator | `/research-tech` |
 
 ## Commands
 
-```
-/build-feature <name>              — Build a new feature
-/debug-bug <description>           — Debug and fix a bug
-/code-review [--focus type]        — Multi-lens code review
-/run-tests [--type unit|e2e|all]   — Run test suites
-/deploy-app --env staging|production — Deploy application
-/research-tech <topic>             — Research technology
-```
+| Command | Description |
+|---------|-------------|
+| `/build-feature <name>` | Build feature with 10 parallel agents |
+| `/code-review` | Multi-lens parallel code review |
+| `/deploy-app --env <env>` | Deploy to staging/production |
+| `/run-tests` | Run test suites |
 
 ## File Ownership Rules
 
-1. Each agent owns specific directories
-2. No overlapping writes between agents
-3. All agents can read all files
-4. Reviewer is always read-only
+1. Each agent has **exclusive write access** to their directories
+2. All agents can **read any file**
+3. Agents **coordinate through files**, not messages
+
+## Agent Ownership Map
+
+| Agent | Write Access |
+|-------|--------------|
+| Product Manager | `docs/knowledge/product.md`, `docs/features/*/user-stories.md` |
+| Architect | `docs/architecture.md`, `docs/features/*/adr.md` |
+| Backend Engineer | `app/backend/`, `tests/unit/backend/`, `tests/integration/` |
+| Frontend Engineer | `app/frontend/`, `tests/unit/frontend/`, `tests/e2e/` |
+| DevOps Engineer | `platform/`, `docker-compose.yml` |
+| QA Engineer | `tests/`, `docs/features/*/acceptance.md` |
+| Performance Engineer | `tests/benchmarks/`, `docs/features/*/performance.md` |
 
 ## Context Priority
 
-When working on tasks, prioritize context:
-1. Current task requirements
-2. Relevant source code in ownership area
-3. Test specifications
-4. Architecture decisions (`knowledge/architecture.md`)
-5. Coding standards (`knowledge/coding_standards.md`)
-6. Lessons learned (`knowledge/lessons_learned.md`)
+When working on tasks, prioritize:
+1. Feature request/current task
+2. Agent ownership rules
+3. Existing code in owned directories
+4. Architecture documentation
+5. Knowledge base
 
 ## Coding Conventions
 
-- **TypeScript/React**: camelCase, functional components, hooks
-- **Frontend**: Next.js App Router, Tailwind CSS
-- **Testing**: Jest for unit tests, Playwright for E2E
-- **Git**: Feature branches, conventional commits
+- **TypeScript**: Strict mode, functional style
+- **React**: Functional components, hooks
+- **Testing**: Jest for unit/integration, Playwright for E2E
+- **CSS**: Tailwind CSS
 
 ## Configuration Files
 
@@ -108,5 +121,4 @@ When working on tasks, prioritize context:
 |------|---------|
 | `.agents/*.yaml` | Agent role definitions |
 | `configs/agents.yaml` | Agent model settings |
-| `configs/model_config.yaml` | LLM provider config |
-| `.claude/settings.json` | Agent Teams settings |
+| `.claude/settings.json` | Claude Code settings |

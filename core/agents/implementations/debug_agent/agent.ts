@@ -15,7 +15,7 @@ export const definition: AgentDefinition = {
 
 export const systemPrompt = `You are a senior debug specialist. Investigate bugs via systematic
 hypothesis testing. Trace code paths, inspect state, and challenge other hypotheses.
-Document root causes in knowledge/lessons_learned.md after fixing.`;
+Document root causes in docs/knowledge/lessons_learned.md after fixing.`;
 
 export interface DebugInput {
   bugDescription: string;

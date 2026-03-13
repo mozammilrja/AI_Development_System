@@ -24,8 +24,8 @@ export function RegisterPage() {
     if (!formData.name) newErrors.name = 'Name is required';
     if (!formData.email) newErrors.email = 'Email is required';
     if (!formData.password) newErrors.password = 'Password is required';
-    if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+    if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
@@ -42,7 +42,7 @@ export function RegisterPage() {
         email: formData.email,
         password: formData.password,
       });
-      navigate('/dashboard');
+      navigate('/chat');
     } catch (error: any) {
       setErrors({ form: error.message || 'Registration failed' });
     }

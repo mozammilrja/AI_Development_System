@@ -7,7 +7,7 @@ Contains prompt templates for the **Architect** agent, responsible for system de
 ## Owned Paths
 
 - `docs/architecture.md`
-- `knowledge/`
+- `docs/knowledge/`
 - `configs/`
 
 ## Capabilities

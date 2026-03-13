@@ -30,7 +30,7 @@ Spawn these teammates:
      - Pros vs Cons matrix
      - Risk assessment
      - Recommendation with confidence level
-   - Store findings in `knowledge/` directory
+   - Store findings in `docs/knowledge/` directory
 
 The debate structure ensures no single perspective dominates. After all teammates finish, present the Neutral Evaluator's final report.
 

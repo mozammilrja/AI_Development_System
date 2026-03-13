@@ -59,10 +59,10 @@ Proponent and Critic work in parallel. Neutral Evaluator listens to both and pro
 >    - Risk assessment (impact × probability)
 >    - Recommendation: Adopt / Don't Adopt / Investigate Further
 >    - Confidence level: Low / Medium / High
-> 6. Save the report to `knowledge/` directory
+> 6. Save the report to `docs/knowledge/` directory
 > Be impartial — your value is in balanced judgment, not advocacy.
 
-**File ownership:** `knowledge/`
+**File ownership:** `docs/knowledge/`
 
 ## Placeholders
 - `{{TECHNOLOGY}}` — The technology, library, pattern, or approach to evaluate
@@ -72,4 +72,4 @@ Proponent and Critic work in parallel. Neutral Evaluator listens to both and pro
 - Proponent and Critic should directly engage with each other's arguments
 - Neutral Evaluator should weigh evidence quality, not just quantity
 - Final report should be actionable — include next steps regardless of recommendation
-- Store findings in knowledge/ for future reference
+- Store findings in docs/knowledge/ for future reference

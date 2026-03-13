@@ -27,6 +27,18 @@ export class AuthService {
     if (!user) throw new AppError('User not found', 404);
     return { _id: user._id, name: user.name, email: user.email, role: user.role };
   }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+    // IMPORTANT: Use .save() to trigger the pre-save hash hook
+    const user = await User.findById(userId).select('+password');
+    if (!user) throw new AppError('User not found', 404);
+
+    const isValid = await user.comparePassword(currentPassword);
+    if (!isValid) throw new AppError('Current password is incorrect', 401);
+
+    user.password = newPassword;
+    await user.save(); // This triggers the pre-save hook to hash the password
+  }
 }
 
 export const authService = new AuthService();

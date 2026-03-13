@@ -7,7 +7,7 @@ Contains the implementation for the **Debugger** agent, responsible for root-cau
 ## Owned Paths
 
 - Cross-codebase write access (the only agent with global write permissions)
-- `knowledge/lessons_learned.md` (post-fix documentation)
+- `docs/knowledge/lessons_learned.md` (post-fix documentation)
 
 ## Files
 

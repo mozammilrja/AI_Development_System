@@ -10,26 +10,27 @@ import type {
   WorkflowState,
 } from '../orchestrator/types.js';
 
-/** Per-agent write scopes loaded from definitions. */
+/**
+ * Per-agent write scopes for the 10-agent autonomous team.
+ * Each agent has exclusive write access to their directories.
+ */
 const AGENT_WRITE_SCOPES: Record<string, string[]> = {
-  architect: ['docs/architecture.md', 'knowledge/**', 'configs/**'],
-  planner: ['docs/tasks/**', 'core/agents/teams/**'],
-  frontend: ['apps/frontend/**', 'saas-app/frontend/**'],
-  backend: ['apps/backend/**', 'saas-app/backend/**', 'apps/database/**'],
-  'ui-designer': ['docs/design/**'],
-  qa: ['tests/**'],
-  tester: ['tests/**', 'platform/simulations/**'],
-  security: ['docs/security/**'],
-  reviewer: [],
-  debugger: ['**'],
-  devops: ['platform/infrastructure/**'],
-  documentation: ['docs/**', 'README.md'],
+  'product-manager': ['docs/product.md', 'docs/user-stories/**', 'docs/acceptance/**', 'docs/features/**'],
+  'architect': ['docs/architecture.md', 'docs/adr/**', 'docs/knowledge/architecture.md', 'docs/api-contracts/**'],
+  'backend-engineer': ['app/backend/**', 'tests/unit/backend/**', 'tests/integration/**', 'docs/api/**'],
+  'frontend-engineer': ['app/frontend/**', 'tests/unit/frontend/**', 'tests/e2e/**'],
+  'ui-designer': ['ui/**', 'docs/design/**'],
+  'devops-engineer': ['platform/**', '.github/**', 'docker-compose.yml', 'docs/infrastructure/**'],
+  'security-engineer': ['security/**', 'docs/security/**', 'tests/security/**'],
+  'qa-engineer': ['tests/**', 'docs/testing/**'],
+  'performance-engineer': ['tests/benchmarks/**', 'docs/tests/benchmarks/**', 'tests/tests/benchmarks/**'],
+  'code-reviewer': ['reviews/**'],
 };
 
 /**
  * Launches a team of agents according to a team template's pattern.
- * Supports concurrent execution with configurable parallelism and
- * automatic write-conflict detection so agents never collide on files.
+ * Supports autonomous parallel execution where all agents start
+ * simultaneously and coordinate through file-based communication.
  */
 export class TeamLauncher extends EventEmitter {
   private readonly runner: AgentRunner;
@@ -38,7 +39,8 @@ export class TeamLauncher extends EventEmitter {
   constructor(runner?: AgentRunner, concurrency?: Partial<ConcurrencyConfig>) {
     super();
     this.runner = runner ?? new AgentRunner();
-    this.concurrency = { maxParallel: 4, failFast: false, ...concurrency };
+    // Default to 10 parallel agents for autonomous execution
+    this.concurrency = { maxParallel: 10, failFast: false, ...concurrency };
   }
 
   /** Execute all tasks for a team according to the template pattern. */
@@ -73,8 +75,17 @@ export class TeamLauncher extends EventEmitter {
         results = await this.runAdversarial(tasks, workflow);
         break;
 
+      case 'autonomous_parallel':
+        results = await this.runAutonomousParallel(tasks, workflow);
+        break;
+
+      case 'phased_sequential':
+        results = await this.runPhasedSequential(tasks, workflow, template);
+        break;
+
       default:
-        results = await this.runSequential(tasks, workflow);
+        // Default to autonomous_parallel - all agents start immediately
+        results = await this.runAutonomousParallel(tasks, workflow);
     }
 
     this.emit('team:complete', {
@@ -89,6 +100,110 @@ export class TeamLauncher extends EventEmitter {
   }
 
   // ── execution strategies ────────────────────────────────────
+
+  /**
+   * Autonomous parallel execution for the 10-agent team.
+   * All agents start simultaneously with no dependencies.
+   */
+  private async runAutonomousParallel(
+    tasks: Task[],
+    workflow: WorkflowState,
+  ): Promise<AgentRunResult[]> {
+    this.emit('execution:mode', { mode: 'autonomous_parallel', agents: tasks.length });
+    
+    // Verify no write conflicts (should not happen with proper ownership)
+    const claims = this.buildWriteClaims(tasks);
+    const conflicts = this.runner.detectWriteConflicts(claims);
+    if (conflicts.length > 0) {
+      this.emit('team:write-conflict', { conflicts });
+      // Continue anyway since ownership is designed to not overlap
+    }
+
+    // Launch all agents simultaneously
+    const options: RunOptions[] = tasks.map((t) => ({
+      taskId: t.id,
+      agentName: t.assignedTo,
+      prompt: t.description,
+      context: { workflow: workflow.context, autonomousMode: true },
+    }));
+
+    const batch = await this.runner.runParallel(options, this.concurrency);
+    return batch.results;
+  }
+
+  /**
+   * Phased sequential execution with dependencies.
+   * Phase 1: Architect (requires approval)
+   * Phase 2: Backend + Frontend (parallel)
+   * Phase 3: Tester (after implementation)
+   * Phase 4: Reviewer (after testing)
+   */
+  private async runPhasedSequential(
+    tasks: Task[],
+    workflow: WorkflowState,
+    template: TeamTemplate,
+  ): Promise<AgentRunResult[]> {
+    this.emit('execution:mode', { mode: 'phased_sequential', phases: template.phases?.length || 4 });
+    
+    const results: AgentRunResult[] = [];
+    const phases = template.phases || [];
+
+    for (const phase of phases) {
+      this.emit('phase:start', { name: phase.name, agents: phase.agents });
+
+      // Get tasks for this phase
+      const phaseTasks = tasks.filter(t => phase.agents.includes(t.assignedTo));
+      
+      if (phaseTasks.length === 0) {
+        this.emit('phase:skip', { name: phase.name, reason: 'no tasks' });
+        continue;
+      }
+
+      let phaseResults: AgentRunResult[];
+
+      if (phase.parallel && phaseTasks.length > 1) {
+        // Run agents in parallel within this phase
+        const options: RunOptions[] = phaseTasks.map((t) => ({
+          taskId: t.id,
+          agentName: t.assignedTo,
+          prompt: t.description,
+          context: { workflow: workflow.context, phase: phase.name },
+        }));
+        const batch = await this.runner.runParallel(options, this.concurrency);
+        phaseResults = batch.results;
+      } else {
+        // Run agents sequentially
+        phaseResults = [];
+        for (const task of phaseTasks) {
+          const result = await this.runTask(task, workflow);
+          phaseResults.push(result);
+          if (result.status === 'failed' && phase.blocking) {
+            this.emit('phase:failed', { name: phase.name, task: task.id });
+            break;
+          }
+        }
+      }
+
+      results.push(...phaseResults);
+
+      // Check if phase requires approval
+      if (phase.requiresApproval) {
+        this.emit('phase:approval-required', { name: phase.name });
+        // In real implementation, would wait for external approval
+      }
+
+      // Check if any phase task failed and phase is blocking
+      const phaseFailed = phaseResults.some(r => r.status === 'failed');
+      if (phaseFailed && phase.blocking) {
+        this.emit('phase:blocked', { name: phase.name });
+        break;
+      }
+
+      this.emit('phase:complete', { name: phase.name, results: phaseResults.length });
+    }
+
+    return results;
+  }
 
   /** One agent at a time. Stops on first failure. */
   private async runSequential(

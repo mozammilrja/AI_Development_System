@@ -14,7 +14,7 @@ export const tools = {
   fileEditor: {
     name: 'file_editor',
     description: 'Edit files within owned directories',
-    allowedPaths: ['docs/architecture.md', 'knowledge/**'],
+    allowedPaths: ['docs/architecture.md', 'docs/knowledge/**'],
   },
 
   /** Parse source code to extract structure information. */

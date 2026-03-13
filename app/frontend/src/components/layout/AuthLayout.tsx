@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 interface AuthLayoutProps {
   children: ReactNode;
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
 }
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
@@ -14,7 +14,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
         {/* Logo */}
         <Link to="/" className="flex justify-center">
           <div className="h-12 w-12 rounded-xl bg-blue-600 flex items-center justify-center">
-            <span className="text-white font-bold text-2xl">S</span>
+            <span className="text-white font-bold text-2xl">C</span>
           </div>
         </Link>
 
@@ -37,7 +37,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
 
       {/* Footer */}
       <div className="mt-8 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} SaasApp. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} ChatHub. All rights reserved.</p>
       </div>
     </div>
   );

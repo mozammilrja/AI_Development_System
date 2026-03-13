@@ -8,7 +8,7 @@ export const definition: AgentDefinition = {
   tools: ['file_editor', 'repo_reader', 'terminal_executor'],
   permissions: {
     read: 'all',
-    write: ['platform/infrastructure/**', 'platform/environments/**'],
+    write: ['platform/**', 'platform/environments/**'],
     execute: ['docker', 'terraform', 'npm', 'node'],
   },
 };

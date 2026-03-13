@@ -6,7 +6,7 @@ Contains the implementation for the **DevOps** agent, responsible for Docker, Te
 
 ## Owned Paths
 
-- `platform/infrastructure/`
+- `platform/`
 - `platform/environments/`
 
 ## Files

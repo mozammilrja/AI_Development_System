@@ -29,7 +29,7 @@ All three are instances of the **Debugger** agent with different focus areas.
 |-------|----------------|
 | Investigators A/B/C | Cross-codebase read; no writes during investigation |
 | Lead (fix phase) | Cross-codebase write to apply the fix |
-| Lead (docs) | `knowledge/lessons_learned.md` |
+| Lead (docs) | `docs/knowledge/lessons_learned.md` |
 
 During investigation, no agent writes code. The fix is applied only after debate resolution.
 
@@ -51,7 +51,7 @@ During investigation, no agent writes code. The fix is applied only after debate
 4. Lead reviews debate evidence
 5. Lead writes fix based on winning theory
 6. Lead runs tests to validate
-7. Lead documents root cause in knowledge/lessons_learned.md
+7. Lead documents root cause in docs/knowledge/lessons_learned.md
 ```
 
 ## Team Structure
@@ -106,7 +106,7 @@ After all investigators finish:
 2. Determine which hypothesis survived the adversarial debate
 3. Write the fix based on the winning theory
 4. Run tests to validate the fix
-5. Document the root cause in `knowledge/lessons_learned.md`
+5. Document the root cause in `docs/knowledge/lessons_learned.md`
 
 ## Placeholders
 - `{{BUG_DESCRIPTION}}` — Full description of the bug including error messages, stack traces, and reproduction steps

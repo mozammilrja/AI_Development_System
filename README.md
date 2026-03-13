@@ -1,22 +1,26 @@
 # AI Development System
 
-A **multi-agent AI development platform** that orchestrates specialized agents to automate software development workflows.
+A **fully autonomous multi-agent software engineering platform** where 10 specialized AI agents work **in parallel** to design, build, test, and deploy software.
 
 ## Overview
 
-This system uses Claude Code Agent Teams to coordinate multiple AI agents that collaborate on building, testing, reviewing, and deploying software applications.
+This system uses Claude Code Agent Teams to orchestrate 10 autonomous AI agents that collaborate **simultaneously** without sequential phases. All agents start at the same time and coordinate through repository files.
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                    Claude Code Interface                      │
-├──────────────────────────────────────────────────────────────┤
-│                       Agent Teams                             │
-│   Architect │ Planner │ Frontend │ Backend │ QA │ Security   │
-│   UI-Designer │ Tester │ Debugger │ Reviewer │ DevOps │ Docs │
-├──────────────────────────────────────────────────────────────┤
-│                    Workspace Layer                             │
-│                  apps/ │ saas-app/                            │
-└──────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        AUTONOMOUS MULTI-AGENT TEAM                          │
+│                        (10 Agents Running in Parallel)                      │
+├──────────┬──────────┬──────────┬──────────┬──────────┬──────────────────────┤
+│ Product  │ Arch-    │ Backend  │ Frontend │ UI       │ DevOps               │
+│ Manager  │ itect    │ Engineer │ Engineer │ Designer │ Engineer             │
+├──────────┼──────────┼──────────┼──────────┼──────────┼──────────────────────┤
+│ Security │ QA       │ Perform- │ Code     │          │                      │
+│ Engineer │ Engineer │ ance Eng │ Reviewer │          │                      │
+└──────────┴──────────┴──────────┴──────────┴──────────┴──────────────────────┘
+                                    │
+                        ┌───────────┴────────────┐
+                        │   File-Based Coord.    │
+                        └────────────────────────┘
 ```
 
 ## Quick Start
@@ -34,69 +38,110 @@ This system uses Claude Code Agent Teams to coordinate multiple AI agents that c
 git clone <repo-url> ai-dev-system
 cd ai-dev-system
 
-# Configure environment (optional)
-cp .env.example .env.local
-# Edit .env.local with your API keys
+# Install dependencies
+npm install
 
 # Open in Claude Code
 code .
 ```
 
-### First Command
+### Build Your First Feature
 
+```bash
+/build-feature user-authentication
 ```
-/build-feature hello-world
-```
+
+This spawns all 10 agents to work simultaneously on the feature.
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `/build-feature <name>` | Build a new feature |
-| `/debug-bug <description>` | Debug and fix a bug |
-| `/code-review` | Multi-lens code review |
-| `/run-tests [--type unit\|e2e\|all]` | Run test suites |
-| `/deploy-app --env staging` | Deploy application |
-| `/research-tech <topic>` | Research technology |
+| `/build-feature <name>` | Build feature with 10 parallel agents |
+| `/code-review` | Multi-lens parallel code review |
+| `/deploy-app --env staging` | Deploy to staging/production |
+| `/run-tests` | Run test suites |
 
-## Agent Roles
+## The 10-Agent Team
 
 | Agent | Role | Owns |
 |-------|------|------|
-| **Architect** | System design | `docs/architecture.md`, `knowledge/` |
-| **Planner** | Task breakdown | `docs/tasks/` |
-| **Frontend** | UI development | `apps/frontend/` |
-| **Backend** | API development | `apps/backend/` |
-| **UI-Designer** | Design system | `docs/design/` |
-| **QA** | Quality assurance | `tests/` |
-| **Tester** | Test implementation | `tests/` |
-| **Security** | Security audits | Read-only |
-| **Reviewer** | Code review | Read-only |
-| **Debugger** | Bug analysis | Cross-codebase |
-| **DevOps** | Deployment | `platform/` |
-| **Documentation** | Documentation | `docs/` |
+| **Product Manager** | Requirements, user stories | `docs/product.md`, `docs/user-stories/` |
+| **Architect** | System design, APIs | `docs/architecture.md`, `docs/api-contracts/` |
+| **Backend Engineer** | APIs, services, database | `app/backend/` |
+| **Frontend Engineer** | React components, pages | `app/frontend/` |
+| **UI Designer** | Component specs, design tokens | `ui/` |
+| **DevOps Engineer** | CI/CD, infrastructure | `platform/`, `.github/` |
+| **Security Engineer** | Security audits | `security/` |
+| **QA Engineer** | Unit, integration, E2E tests | `tests/` |
+| **Performance Engineer** | Benchmarks, load tests | `tests/benchmarks/` |
+| **Code Reviewer** | Code quality review | `reviews/` (read-only) |
+
+## Execution Model
+
+### Autonomous Parallel Execution
+
+All 10 agents start **simultaneously** when a command is invoked:
+
+1. **No Sequential Phases** — All agents begin at t=0
+2. **Independent Work** — Agents work autonomously
+3. **File-Based Coordination** — Agents communicate through files
+4. **Exclusive Ownership** — Each agent writes only to their directories
+5. **Final Report** — Generated when all agents complete
+
+### Example
+
+```
+/build-feature user-authentication
+
+[t=0] All 10 agents started simultaneously
+
+[product-manager]     Defining requirements...
+[architect]           Designing authentication system...
+[backend-engineer]    Implementing auth APIs...
+[frontend-engineer]   Creating login components...
+[ui-designer]         Creating design specs...
+[devops-engineer]     Setting up CI pipeline...
+[security-engineer]   Auditing auth implementation...
+[qa-engineer]         Writing auth tests...
+[performance-engineer] Creating benchmarks...
+[code-reviewer]       Reviewing all changes...
+
+[t=end] All agents completed
+
+== FINAL REPORT ==
+✓ 5 user stories defined
+✓ Architecture designed
+✓ Backend: 8 files, 450 lines
+✓ Frontend: 12 files, 6 components
+✓ 42 tests passing
+✓ Security: 0 critical issues
+✓ Review: APPROVED
+```
 
 ## Project Structure
 
 ```
-ai-dev-system/
-├── .agents/           # Agent definitions (YAML)
-├── .claude/           # Claude Code config
-│   ├── commands/      # Slash commands
-│   ├── skills/        # Reusable skills
-│   └── settings.json  # Agent Teams config
-├── core/              # Orchestration
-│   ├── agents/        # Teams, definitions, prompts
-│   └── workflows/     # Workflow docs
-├── configs/           # Configuration files
+ai-development-system/
+├── .agents/           # Agent definitions (10 YAML files)
+├── .claude/           # Commands and config
+│   └── commands/      # Slash commands
+├── .agent-status/     # Agent status tracking
+├── core/              # Orchestration (TypeScript)
+│   ├── orchestrator/  # Agent execution
+│   ├── services/      # Team launcher
+│   └── workflows/     # Workflow definitions
+├── services/          # Application code
+│   ├── backend/       # (Backend Engineer)
+│   └── frontend/      # (Frontend Engineer)
+├── ui/                # UI designs (UI Designer)
+├── security/          # Security (Security Engineer)
+├── tests/benchmarks/       # Performance (Performance Engineer)
+├── reviews/           # Code reviews (Code Reviewer)
+├── tests/             # Tests (QA Engineer)
+├── platform/          # Infrastructure (DevOps)
 ├── docs/              # Documentation
-├── knowledge/         # Knowledge base
-├── apps/              # Application workspace
-│   ├── frontend/      # Next.js frontend
-│   ├── backend/       # Backend services
-│   └── database/      # Database config
-├── saas-app/          # SaaS workspace
-└── platform/          # Infrastructure
+└── docs/knowledge/         # Knowledge base
 ```
 
 ## Team Patterns
@@ -152,10 +197,10 @@ Enable in `.claude/settings.json`:
 
 ## Knowledge Base
 
-- `knowledge/architecture.md` — Architecture decisions
-- `knowledge/coding_standards.md` — Coding standards
-- `knowledge/lessons_learned.md` — Lessons learned
-- `knowledge/project_context.md` — Project context
+- `docs/knowledge/architecture.md` — Architecture decisions
+- `docs/knowledge/coding_standards.md` — Coding standards
+- `docs/knowledge/lessons_learned.md` — Lessons learned
+- `docs/knowledge/project_context.md` — Project context
 
 ## Contributing
 

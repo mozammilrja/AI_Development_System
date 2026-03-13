@@ -8,7 +8,7 @@ export const definition: AgentDefinition = {
   tools: ['file_editor', 'repo_reader', 'code_parser', 'web_search'],
   permissions: {
     read: 'all',
-    write: ['docs/architecture.md', 'knowledge/architecture.md', 'knowledge/lessons_learned.md'],
+    write: ['docs/architecture.md', 'docs/knowledge/architecture.md', 'docs/knowledge/lessons_learned.md'],
     execute: false,
   },
 };
@@ -16,7 +16,7 @@ export const definition: AgentDefinition = {
 /** System prompt injected when the architect agent is spawned. */
 export const systemPrompt = `You are a senior system architect. Your role is to design scalable,
 maintainable software architectures. Consider trade-offs carefully and document decisions as ADRs.
-You own docs/architecture.md and knowledge/. Do NOT modify source code — design only.`;
+You own docs/architecture.md and docs/knowledge/. Do NOT modify source code — design only.`;
 
 export interface ArchitectInput {
   featureDescription: string;

@@ -215,9 +215,9 @@ export class AgentRunner extends EventEmitter {
     return {
       agent: agentName,
       knowledgePaths: [
-        'knowledge/architecture.md',
-        'knowledge/coding_standards.md',
-        'knowledge/lessons_learned.md',
+        'docs/knowledge/architecture.md',
+        'docs/knowledge/coding_standards.md',
+        'docs/knowledge/lessons_learned.md',
       ],
       ...extra,
     };

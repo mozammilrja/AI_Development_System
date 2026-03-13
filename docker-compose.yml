@@ -1,0 +1,151 @@
+version: '3.8'
+
+services:
+  # MongoDB - Primary database
+  mongodb:
+    image: mongo:7.0
+    container_name: chathub-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: adminpassword
+      MONGO_INITDB_DATABASE: chathub
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+      - ./platform/infrastructure/docker/mongo-init.js:/docker-entrypoint-initdb.d/init.js:ro
+    networks:
+      - chathub-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis - Caching and Pub/Sub
+  redis:
+    image: redis:7-alpine
+    container_name: chathub-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - chathub-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO - S3-compatible object storage
+  minio:
+    image: minio/minio:latest
+    container_name: chathub-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - '9000:9000'   # API
+      - '9001:9001'   # Console
+    volumes:
+      - minio_data:/data
+    networks:
+      - chathub-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # Elasticsearch - Full-text search (optional)
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+  #   container_name: chathub-elasticsearch
+  #   restart: unless-stopped
+  #   environment:
+  #     - discovery.type=single-node
+  #     - xpack.security.enabled=false
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #   ports:
+  #     - '9200:9200'
+  #   volumes:
+  #     - elasticsearch_data:/usr/share/elasticsearch/data
+  #   networks:
+  #     - chathub-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./app/backend
+      dockerfile: Dockerfile
+    container_name: chathub-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGODB_URI: mongodb://admin:adminpassword@mongodb:27017/chathub?authSource=admin
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: chathub-media
+      MINIO_USE_SSL: 'false'
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRES_IN: 7d
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./app/backend/src:/app/src:ro
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - chathub-network
+    command: npm run dev
+
+  # Frontend (Vite dev server)
+  frontend:
+    build:
+      context: ./app/frontend
+      dockerfile: Dockerfile
+    container_name: chathub-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:5000
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./app/frontend/src:/app/src:ro
+      - ./app/frontend/public:/app/public:ro
+    depends_on:
+      - backend
+    networks:
+      - chathub-network
+    command: npm run dev -- --host
+
+volumes:
+  mongodb_data:
+  redis_data:
+  minio_data:
+  # elasticsearch_data:
+
+networks:
+  chathub-network:
+    driver: bridge

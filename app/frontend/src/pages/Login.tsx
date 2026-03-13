@@ -29,7 +29,7 @@ export function LoginPage() {
 
     try {
       await login.mutateAsync(formData);
-      navigate('/dashboard');
+      navigate('/chat');
     } catch (error: any) {
       setErrors({ form: error.message || 'Invalid credentials' });
     }

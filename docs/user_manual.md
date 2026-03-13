@@ -209,7 +209,7 @@ Research and evaluate a technology.
 
 | Agent | Role | Owns |
 |-------|------|------|
-| **Architect** | System design | `docs/architecture.md`, `knowledge/` |
+| **Architect** | System design | `docs/architecture.md`, `docs/knowledge/` |
 | **Planner** | Task breakdown | `docs/tasks/` |
 | **Frontend** | UI development | `apps/frontend/` |
 | **Backend** | API development | `apps/backend/` |
@@ -383,7 +383,7 @@ ai-dev-system/
 ├── core/              # Orchestration
 ├── configs/           # Configuration
 ├── docs/              # Documentation
-├── knowledge/         # Knowledge base
+├── docs/knowledge/         # Knowledge base
 ├── apps/              # App workspace
 ├── saas-app/          # SaaS workspace
 └── platform/          # Infrastructure

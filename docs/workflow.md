@@ -4,100 +4,273 @@ This document describes how agents collaborate in the AI Development System.
 
 ---
 
-## Agent Collaboration Model
+## Autonomous Parallel Execution Model
 
-Agents work together through **Claude Code Agent Teams** — multiple Claude instances coordinating via shared task lists and direct messaging.
+The AI Development System uses **fully autonomous parallel execution** where all 10 agents start simultaneously and work independently without waiting for each other.
 
-### Collaboration Principles
+### Key Principles
 
-1. **File Ownership** — Each agent owns specific directories
-2. **Sequential Handoffs** — Output from one agent feeds the next
-3. **Parallel Execution** — Independent tasks run concurrently
-4. **Adversarial Review** — Competing perspectives for better outcomes
+1. **No Sequential Phases** — All agents start at t=0
+2. **File-Based Coordination** — Agents communicate through repository files
+3. **Exclusive Ownership** — Each agent writes only to their directories
+4. **Continuous Monitoring** — Agents watch for relevant file changes
+5. **Independent Completion** — Agents complete when their work is done
+
+---
+
+## The 10-Agent Team
+
+| Agent | Role | Writes To |
+|-------|------|-----------|
+| **Product Manager** | Requirements, user stories | `docs/product.md`, `docs/user-stories/` |
+| **Architect** | System design, APIs | `docs/architecture.md`, `docs/api-contracts/` |
+| **Backend Engineer** | APIs, services, database | `app/backend/` |
+| **Frontend Engineer** | React components, pages | `app/frontend/` |
+| **UI Designer** | Component specs, design tokens | `ui/` |
+| **DevOps Engineer** | CI/CD, infrastructure | `platform/`, `.github/` |
+| **Security Engineer** | Security audits, policies | `security/` |
+| **QA Engineer** | Tests | `tests/` |
+| **Performance Engineer** | Benchmarks, load tests | `tests/benchmarks/` |
+| **Code Reviewer** | Code review reports | `reviews/` |
 
 ---
 
 ## 1. Feature Development Workflow
 
-Full feature development from requirements to deployment.
+### Execution
 
-### Team Structure
+All 10 agents start **simultaneously** when `/build-feature` is invoked:
 
 ```
-         ┌──────────┐
-         │ Architect │  → Design system architecture
-         └────┬─────┘
-              │
-         ┌────┴────┐
-         │ Planner │  → Break down into tasks
-         └────┬────┘
-              │
-     ┌────────┴────────┐
-     ▼                  ▼
-┌──────────┐     ┌──────────┐
-│ Frontend │     │ Backend  │  → Parallel implementation
-└────┬─────┘     └────┬─────┘
-     └────────┬───────┘
-              ▼
-         ┌──────────┐
-         │    QA    │  → Test the implementation
-         └────┬─────┘
-              ▼
-         ┌──────────┐
-         │ Reviewer │  → Code review
-         └──────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                    t=0 : ALL AGENTS START                          │
+├──────────┬──────────┬──────────┬──────────┬──────────┬──────────┤
+│ Product  │ Architect│ Backend  │ Frontend │ UI       │ DevOps   │
+│ Manager  │          │ Engineer │ Engineer │ Designer │ Engineer │
+├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤
+│ Security │ QA       │ Perform- │ Code     │          │          │
+│ Engineer │ Engineer │ ance Eng │ Reviewer │          │          │
+└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
+                              │
+              [All working independently in parallel]
+                              │
+                              ▼
+                    ┌─────────────────┐
+                    │  FINAL REPORT   │
+                    └─────────────────┘
 ```
 
 ### Command
 
-```
-/build-feature <feature-name>
-```
-
-### Agent Responsibilities
-
-| Agent | Task |
-|-------|------|
-| **Architect** | Design architecture, define interfaces |
-| **Planner** | Create task breakdown, assign work |
-| **Frontend** | Build UI components and pages |
-| **Backend** | Build APIs and services |
-| **QA** | Write and run tests |
-| **Reviewer** | Review code quality |
-
-### Example
-
-```
+```bash
 /build-feature user-authentication
+```
 
-[architect]   Designing authentication system...
-[architect]   ADR created: JWT with refresh tokens
-[planner]     Created 6 tasks: 2 backend, 3 frontend, 1 test
-[backend]     Implementing AuthService...
-[frontend]    Creating LoginForm component...
-[backend]     ✓ Auth endpoints complete
-[frontend]    ✓ Login/Register UI complete
-[qa]          Running test suite... 18/18 passed
-[reviewer]    Code review: APPROVED
+### Agent Activities (All Simultaneous)
+
+| Agent | Activity |
+|-------|----------|
+| Product Manager | Write requirements to `docs/product.md` |
+| Architect | Design architecture, write to `docs/architecture.md` |
+| Backend Engineer | Implement APIs in `app/backend/` |
+| Frontend Engineer | Build UI in `app/frontend/` |
+| UI Designer | Create designs in `ui/` |
+| DevOps Engineer | Configure CI/CD in `platform/` |
+| Security Engineer | Audit code, write to `security/` |
+| QA Engineer | Write tests in `tests/` |
+| Performance Engineer | Create benchmarks in `tests/benchmarks/` |
+| Code Reviewer | Review code, write to `reviews/` |
+
+### Example Output
+
+```
+[t=0] All 10 agents started
+
+[product-manager]     Writing requirements...
+[architect]           Designing system architecture...
+[backend-engineer]    Implementing auth service...
+[frontend-engineer]   Creating login components...
+[ui-designer]         Creating design specs...
+[devops-engineer]     Setting up CI pipeline...
+[security-engineer]   Auditing authentication code...
+[qa-engineer]         Writing auth tests...
+[performance-engineer] Creating auth benchmarks...
+[code-reviewer]       Reviewing all changes...
+
+[t=end] All agents completed
+
+== FINAL REPORT ==
+Product: 5 user stories defined
+Architecture: System designed, 2 ADRs created
+Backend: 8 files, 450 lines
+Frontend: 12 files, 6 components
+UI: 4 component specs, design tokens
+DevOps: CI pipeline configured
+Security: 0 critical, 1 medium issue
+QA: 42 tests written, 100% passing
+Performance: API < 50ms
+Review: APPROVED with suggestions
 ```
 
 ---
 
-## 2. Debug Investigation Workflow
+## 2. Code Review Workflow
 
-Bug analysis using competing hypotheses.
-
-### Team Structure
+Multi-perspective parallel review:
 
 ```
-┌────────────────┐  ┌────────────────┐  ┌────────────────┐
-│ Investigator A │  │ Investigator B │  │ Investigator C │
-│ (Logic errors) │  │ (State/data)   │  │ (Integration)  │
-└───────┬────────┘  └───────┬────────┘  └───────┬────────┘
-        │                   │                    │
-        └───────── challenge each other ─────────┘
-                            │
-                     ┌──────┴──────┐
+┌────────────────┬────────────────┬────────────────┬────────────────┐
+│   Security     │   Quality      │   Performance  │     Test       │
+│   Reviewer     │   Reviewer     │   Reviewer     │   Reviewer     │
+└───────┬────────┴───────┬────────┴───────┬────────┴───────┬────────┘
+        │                │                 │                │
+        └────────────────┴─────────────────┴────────────────┘
+                                  │
+                         [All work in parallel]
+                                  │
+                                  ▼
+                         ┌─────────────────┐
+                         │    SUMMARY      │
+                         └─────────────────┘
+```
+
+### Command
+
+```bash
+/code-review
+```
+
+---
+
+## 3. Deployment Workflow
+
+Parallel preparation followed by deployment:
+
+```
+┌─────────────────────────────────────────┐
+│        PHASE 1: Preparation (Parallel)  │
+├──────────────┬──────────────┬───────────┤
+│    DevOps    │      QA      │  Security │
+│    Build     │   Prepare    │   Audit   │
+└──────────────┴──────────────┴───────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│        PHASE 2: Deploy                  │
+│             DevOps                      │
+└─────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│        PHASE 3: Validation (Parallel)   │
+├──────────────────────┬──────────────────┤
+│          QA          │     Security     │
+│    Smoke Tests       │    Pen Test      │
+└──────────────────────┴──────────────────┘
+                     │
+              ┌──────┴──────┐
+              ▼             ▼
+           SUCCESS       ROLLBACK
+```
+
+### Command
+
+```bash
+/deploy-app --env staging
+```
+
+---
+
+## File-Based Coordination
+
+Agents coordinate by reading and writing repository files:
+
+### Product Manager → All Agents
+```
+writes: docs/product.md
+reads:  (feature request)
+```
+
+### Architect → Backend/Frontend
+```
+writes: docs/architecture.md, docs/api-contracts/
+reads:  docs/product.md
+```
+
+### Backend/Frontend → QA/Security/Performance
+```
+writes: app/backend/, app/frontend/
+reads:  docs/architecture.md, docs/api-contracts/, ui/
+```
+
+### QA/Security/Performance → Code Reviewer
+```
+writes: tests/, security/, tests/benchmarks/
+reads:  services/
+```
+
+### Code Reviewer → Final Report
+```
+writes: reviews/
+reads:  (all)
+```
+
+---
+
+## Status Tracking
+
+Each agent updates `.agent-status/<agent>.json`:
+
+```json
+{
+  "agent": "backend-engineer",
+  "status": "active",
+  "currentTask": "Implementing user service",
+  "progress": 0.75,
+  "filesChanged": ["app/backend/src/user.ts"],
+  "lastUpdate": "2025-03-14T12:00:00Z"
+}
+```
+
+---
+
+## Ownership Rules
+
+### Strict Enforcement
+- Agents ONLY write to their owned directories
+- Agents can READ any file
+- Code Reviewer is READ-ONLY (writes only to `reviews/`)
+
+### Conflict Prevention
+- No directory overlap between agents
+- Clear boundaries prevent write conflicts
+- Agents monitor others' output for coordination
+
+---
+
+## Previous vs Current Model
+
+### Previous (Sequential)
+
+```
+Phase 1: Architect designs
+Phase 2: Backend + Frontend implement
+Phase 3: Tester writes tests
+Phase 4: Reviewer audits
+
+Total time: Sum of all phases
+```
+
+### Current (Parallel)
+
+```
+t=0: All 10 agents start
+t=end: All agents complete
+
+Total time: Max(agent completion times)
+```
+
+**Benefit:** Significantly faster feature development through parallelization.
                      │  Synthesis  │  → Best solution
                      └─────────────┘
 ```
