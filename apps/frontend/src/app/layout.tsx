@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "AI Dev System",
-  description: "Multi-agent AI development dashboard",
+  title: 'AI Development System',
+  description: 'Multi-agent AI development platform',
 };
 
 export default function RootLayout({

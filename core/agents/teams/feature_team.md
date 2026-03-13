@@ -1,5 +1,61 @@
 # Feature Development Team Template
 
+## Team Goal
+
+Design, implement, test, and review a complete feature across the full stack. The Architect produces an approved design, Frontend and Backend agents implement in parallel with no file conflicts, the Tester validates both sides, and the Reviewer performs a final quality gate — all without human intervention.
+
+## Team Members
+
+| # | Agent | Role on Team |
+|---|-------|--------------|
+| 1 | Architect | Lead designer — produces the plan that all others follow |
+| 2 | Frontend Developer | Implements UI components and client-side logic |
+| 3 | Backend Developer | Implements API endpoints, services, and database changes |
+| 4 | Tester | Writes and runs unit, integration, and E2E tests |
+| 5 | Reviewer | Read-only code quality and security review |
+
+## Responsibilities
+
+| Agent | Must Do | Must NOT Do |
+|-------|---------|-------------|
+| Architect | Design component architecture, write ADR, define API contracts | Modify source code |
+| Frontend | Build React/TypeScript components, write component tests | Edit files outside `apps/frontend/` or `saas-app/frontend/` |
+| Backend | Build API endpoints, services, DB models/migrations | Edit files outside `apps/backend/`, `apps/database/`, `saas-app/backend/` |
+| Tester | Write tests, run test suites, report coverage gaps | Edit application source code |
+| Reviewer | Report security, performance, and quality findings | Edit any files (read-only) |
+
+## File Ownership
+
+| Agent | Writable Paths |
+|-------|----------------|
+| Architect | `docs/architecture.md`, `knowledge/architecture.md` |
+| Frontend | `apps/frontend/`, `saas-app/frontend/` |
+| Backend | `apps/backend/`, `apps/database/`, `saas-app/backend/` |
+| Tester | `tests/` |
+| Reviewer | None (read-only) |
+
+No two agents share write access to the same path. All agents may read all files.
+
+## Communication Rules
+
+1. **Architect → Lead**: Architect submits design for plan approval. No implementation begins until approved.
+2. **Lead → Frontend, Backend**: After approval, lead spawns both agents simultaneously with the approved design.
+3. **Frontend ↔ Backend**: No direct messaging. They share the Architect's API contracts as their interface.
+4. **Frontend, Backend → Tester**: Implementation artifacts are available once both complete.
+5. **Tester → Reviewer**: Test results and coverage report accompany the code for review.
+6. **Reviewer → Lead**: Final report aggregated by lead. No file edits by Reviewer.
+
+## Task Flow
+
+```
+1. Architect designs  ──(plan approval)──▶
+2. Frontend builds UI  ──┐
+                         ├──(both complete)──▶
+3. Backend builds API ──┘
+4. Tester validates   ──(tests pass)──▶
+5. Reviewer audits    ──(report)──▶ Done
+```
+
 ## Team Structure
 - **Team size**: 5 teammates
 - **Pattern**: Sequential with parallel middle layer

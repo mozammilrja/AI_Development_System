@@ -1,0 +1,37 @@
+name: ui-designer
+role: UI/UX Designer
+description: Creates UI/UX specifications, design system tokens, and component guidelines.
+
+model:
+  primary: claude-opus-4-20250514
+  fallback: gpt-4o
+  temperature: 0.5
+
+skills:
+  - architecture-design
+
+tools:
+  - file_editor
+  - repo_reader
+
+permissions:
+  read: all
+  write:
+    - docs/design/**
+  execute: false
+
+prompts:
+  system: |
+    You are a senior UI/UX designer. Create design specifications,
+    component guidelines, and design system tokens. Define spacing,
+    color palettes, typography, and interaction patterns. Output
+    specs that developers can implement directly.
+
+tasks:
+  - create_design_spec
+  - define_design_tokens
+  - review_ui_patterns
+  - accessibility_guidelines
+
+dependencies:
+  - architect

@@ -1,5 +1,57 @@
 # Release Coordination Team Template
 
+## Team Goal
+
+Safely build, deploy, and validate a release to a target environment. The Deployer runs pre-flight checks, builds, and deploys; the Validator independently verifies the deployment. If validation fails, the Deployer executes an automatic rollback — ensuring no broken release stays live.
+
+## Team Members
+
+| # | Agent | Role on Team |
+|---|-------|--------------|
+| 1 | Deployer | Builds, packages, and deploys the application; executes rollback on failure |
+| 2 | Validator | Independently verifies the deployment via smoke tests and health checks |
+
+## Responsibilities
+
+| Agent | Must Do | Must NOT Do |
+|-------|---------|-------------|
+| Deployer | Run lint/type-check/audit, run tests, build, deploy, rollback on failure | Approve its own deployment |
+| Validator | Run smoke tests, check health endpoints, verify critical user flows | Deploy or modify infrastructure |
+
+## File Ownership
+
+| Agent | Writable Paths |
+|-------|----------------|
+| Deployer | `platform/infrastructure/`, deployment configs, build artifacts |
+| Validator | `tests/e2e/`, monitoring/validation scripts |
+
+No overlap — Deployer owns infrastructure, Validator owns validation tests.
+
+## Communication Rules
+
+1. **Deployer → Validator**: Message when deployment is complete and ready for validation.
+2. **Deployer → Validator**: Message immediately if any pre-deploy step fails (halt pipeline).
+3. **Validator → Deployer**: Message with SUCCESS if all checks pass.
+4. **Validator → Deployer**: Message with FAILURE + details if any check fails (triggers rollback).
+5. **Deployer → Lead**: Report final status (success or rollback-complete) after pipeline ends.
+6. **No self-approval**: Deployer never validates its own deployment.
+
+## Task Flow
+
+```
+1. Deployer: pre-flight checks (lint, types, audit)
+2. Deployer: run full test suite
+3. Deployer: build and package
+4. Deployer: deploy to target env ──(message)──▶
+5. Validator: smoke tests + health checks + user flows
+         │
+    ┌─ PASS ──▶ 6a. Validator reports SUCCESS → Done
+    └─ FAIL ──▶ 6b. Validator messages Deployer
+                7. Deployer executes ROLLBACK
+                8. Validator re-checks rolled-back version
+                9. Lead produces failure report
+```
+
 ## Team Structure
 - **Team size**: 2 teammates
 - **Pattern**: Sequential with communication-based handoff

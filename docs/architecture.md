@@ -2,7 +2,24 @@
 
 ## System Overview
 
-The AI Development System is a **multi-agent orchestration platform** that automates software development workflows using specialized AI agents. Agents collaborate via Claude Code's native Agent Teams feature to build, test, review, and deploy applications.
+The AI Development System is a **multi-agent orchestration platform** built on **Node.js, TypeScript, and MongoDB**. It automates software development workflows using specialized AI agents that collaborate via Claude Code Agent Teams to build, test, review, and deploy applications.
+
+All orchestration logic — task routing, team launching, workflow execution, and agent communication — is implemented in TypeScript. MongoDB stores workflow state, task progress, agent run history, and inter-agent messages.
+
+---
+
+## Technology Stack
+
+| Layer | Technology |
+|-------|------------|
+| Runtime | Node.js (ES2022) |
+| Language | TypeScript (strict mode) |
+| Database | MongoDB (Mongoose ODM) |
+| AI Agents | Claude Agent Teams (Claude Opus primary, GPT-4o fallback) |
+| SaaS Frontend | React 18, Vite, Tailwind CSS, Zustand, React Query |
+| SaaS Backend | Express.js, JWT (HS256), Zod validation |
+| Apps Frontend | Next.js (App Router) |
+| Infrastructure | Docker Compose, Terraform (AWS) |
 
 ---
 
@@ -10,21 +27,41 @@ The AI Development System is a **multi-agent orchestration platform** that autom
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                    Claude Code Interface                      │
-│               Slash Commands / Agent Teams                    │
+│  1. Interface Layer — Claude Code CLI / VS Code               │
+│     Slash commands: /build-feature, /debug-bug, /code-review  │
 ├──────────────────────────────────────────────────────────────┤
-│                     Agent Orchestration                        │
-│      Team Templates / Workflow Definitions / Coordination     │
+│  2. Orchestration Layer (Node.js / TypeScript)                │
+│     core/orchestrator/agentRunner.ts — Agent execution        │
+│     core/services/taskRouter.ts      — Intent → workflow      │
+│     core/services/teamLauncher.ts    — Team pattern execution │
 ├──────────────────────────────────────────────────────────────┤
-│                       Agent Layer                              │
-│   Architect │ Planner │ Frontend │ Backend │ QA │ Security   │
-│   UI-Designer │ Tester │ Debugger │ Reviewer │ DevOps │ Docs │
+│  3. Workflow Layer (TypeScript DAGs)                           │
+│     core/workflows/developmentFlow.ts — Feature pipeline      │
+│     core/workflows/debugFlow.ts       — Adversarial debug     │
+│     core/workflows/releaseFlow.ts     — Deploy + validate     │
+│     core/workflows/researchFlow.ts    — Proponent vs Critic   │
+│     core/workflows/uiTestingFlow.ts   — E2E + accessibility   │
 ├──────────────────────────────────────────────────────────────┤
-│                    Workspace Layer                             │
-│                  apps/ │ saas-app/                            │
+│  4. Agent Layer (TypeScript implementations)                  │
+│     core/agents/implementations/*/agent.ts — per-agent logic  │
+│     core/agents/implementations/*/tools.ts — tool descriptors │
+│     core/agents/definitions/*.yaml — model + permissions      │
+│     core/agents/teams/*.md — team workflow templates           │
 ├──────────────────────────────────────────────────────────────┤
-│                    Knowledge Layer                             │
-│            knowledge/ │ docs/ │ .claude/                      │
+│  5. Data Layer (MongoDB via Mongoose)                         │
+│     core/models/Task.ts          — tasks collection           │
+│     core/models/AgentRun.ts      — agent_runs collection      │
+│     core/models/TeamMessage.ts   — team_messages collection   │
+│     core/models/WorkflowState.ts — workflow_state collection  │
+├──────────────────────────────────────────────────────────────┤
+│  6. Application Layer                                         │
+│     apps/       — Next.js frontend + database migrations      │
+│     saas-app/   — React/Vite frontend + Express/MongoDB API   │
+├──────────────────────────────────────────────────────────────┤
+│  7. Knowledge Layer                                           │
+│     knowledge/ — Architecture decisions, coding standards     │
+│     docs/      — Documentation                                │
+│     .claude/   — Claude Code config and project context       │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -34,80 +71,144 @@ The AI Development System is a **multi-agent orchestration platform** that autom
 
 ```
 ai-dev-system/
+├── CLAUDE.md                          # Master context for all Claude instances
+├── README.md                          # Project overview
+├── package.json                       # Node.js dependencies
 │
-├── CLAUDE.md                    # Master context for all Claude instances
-├── README.md                    # Project overview and quick start
-├── package.json                 # Node.js dependencies (minimal)
+├── .agents/                           # Agent role definitions (YAML)
+├── .claude/                           # Claude Code configuration
+│   ├── settings.json                  # Agent Teams settings
+│   ├── project_context.md             # Persistent project context
+│   ├── commands/                      # Slash commands
+│   ├── PRD/                           # PRD templates
+│   └── skills/                        # Reusable skills
+├── .github/
+│   └── copilot-instructions.md        # Copilot architecture context
 │
-├── .agents/                     # Agent role definitions
-│   ├── architect.yaml           # System architect
-│   ├── planner.yaml             # Task planner
-│   ├── frontend.yaml            # Frontend developer
-│   ├── backend.yaml             # Backend developer
-│   ├── ui-designer.yaml         # UI/UX designer
-│   ├── qa.yaml                  # QA engineer
-│   ├── tester.yaml              # Test engineer
-│   ├── security.yaml            # Security engineer
-│   ├── reviewer.yaml            # Code reviewer
-│   ├── debugger.yaml            # Debug specialist
-│   ├── devops.yaml              # DevOps engineer
-│   └── documentation.yaml       # Documentation writer
+├── core/                              # Orchestration core (TypeScript)
+│   ├── orchestrator/
+│   │   ├── agentRunner.ts             # Single-agent execution engine
+│   │   ├── types.ts                   # Shared type definitions
+│   │   └── index.ts                   # Barrel exports
+│   ├── services/
+│   │   ├── taskRouter.ts              # Intent detection → workflow routing
+│   │   ├── teamLauncher.ts            # Team pattern execution (seq/par/adversarial)
+│   │   └── index.ts
+│   ├── workflows/
+│   │   ├── baseWorkflow.ts            # Abstract DAG-based workflow
+│   │   ├── developmentFlow.ts         # Feature: architect → FE+BE → test → review
+│   │   ├── debugFlow.ts               # Debug: 3 adversarial investigators → fix
+│   │   ├── releaseFlow.ts             # Release: deploy → validate → rollback
+│   │   ├── researchFlow.ts            # Research: proponent vs critic → evaluate
+│   │   ├── uiTestingFlow.ts           # UI: E2E + visual + accessibility
+│   │   └── index.ts
+│   ├── models/                        # MongoDB models (Mongoose)
+│   │   ├── Task.ts                    # tasks collection
+│   │   ├── AgentRun.ts                # agent_runs collection
+│   │   ├── TeamMessage.ts             # team_messages collection
+│   │   ├── WorkflowState.ts           # workflow_state collection
+│   │   └── index.ts
+│   └── agents/
+│       ├── definitions/               # Agent YAML specs (model, tools, permissions)
+│       ├── implementations/           # Per-agent TypeScript + prompts
+│       │   ├── architect/             # agent.ts, tools.ts, prompts.md, README.md
+│       │   ├── backend_agent/
+│       │   ├── frontend_agent/
+│       │   ├── testing_agent/
+│       │   ├── debug_agent/
+│       │   ├── review_agent/
+│       │   ├── deploy_agent/
+│       │   ├── docs_agent/
+│       │   └── project_manager/
+│       └── teams/                     # Team workflow templates (Markdown)
+│           ├── feature_team.md
+│           ├── debug_team.md
+│           ├── review_team.md
+│           ├── release_team.md
+│           └── research_team.md
 │
-├── .claude/                     # Claude Code configuration
-│   ├── settings.json            # Agent Teams settings
-│   ├── project_context.md       # Project context
-│   ├── commands/                # Slash commands
-│   │   ├── build-feature.md
-│   │   ├── debug-bug.md
-│   │   ├── code-review.md
-│   │   ├── deploy-app.md
-│   │   ├── run-tests.md
-│   │   └── research-tech.md
-│   ├── PRD/                     # PRD templates
-│   └── skills/                  # Reusable skills
+├── configs/                           # Configuration files
+│   ├── agents.yaml                    # Agent model settings
+│   ├── model_config.yaml              # LLM provider + fallback chains
+│   └── environment.yaml               # Environment settings
 │
-├── core/                        # Orchestration core
-│   ├── agents/
-│   │   ├── definitions/         # Agent YAML definitions
-│   │   ├── implementations/     # Agent prompts
-│   │   └── teams/               # Team templates
-│   │       ├── feature_team.md
-│   │       ├── debug_team.md
-│   │       ├── review_team.md
-│   │       ├── release_team.md
-│   │       └── research_team.md
-│   └── workflows/               # Workflow documentation
+├── docs/                              # Documentation
+│   ├── architecture.md                # This file
+│   ├── agent_system.md                # Agent system design guide
+│   ├── copilot_usage.md               # How to use Copilot with this repo
+│   ├── workflow.md                    # Workflow documentation
+│   ├── developer_guide.md             # Developer guide
+│   └── user_manual.md                 # User manual
 │
-├── configs/                     # Configuration files
-│   ├── agents.yaml              # Agent configuration
-│   ├── model_config.yaml        # LLM settings
-│   └── environment.yaml         # Environment settings
+├── knowledge/                         # Living knowledge base
+│   ├── architecture.md                # Architecture decisions
+│   ├── coding_standards.md            # Coding standards
+│   ├── lessons_learned.md             # Lessons learned
+│   └── project_context.md             # Project context
 │
-├── docs/                        # Documentation
-│   ├── architecture.md          # This file
-│   ├── workflow.md              # Workflow documentation
-│   ├── developer_guide.md       # Developer guide
-│   └── user_manual.md           # User manual
+├── apps/                              # Application workspace
+│   ├── frontend/                      # Next.js (App Router)
+│   ├── backend/                       # Backend services
+│   └── database/                      # Database migrations
 │
-├── knowledge/                   # Project knowledge base
-│   ├── architecture.md          # Architecture decisions
-│   ├── coding_standards.md      # Coding standards
-│   ├── lessons_learned.md       # Lessons learned
-│   └── project_context.md       # Project context
+├── saas-app/                          # SaaS application workspace
+│   ├── frontend/                      # React 18 + Vite + Tailwind
+│   └── backend/                       # Express.js + MongoDB
 │
-├── apps/                        # Application workspace
-│   ├── frontend/                # Next.js frontend
-│   ├── backend/                 # Backend services
-│   └── database/                # Database configs
-│
-├── saas-app/                    # SaaS application workspace
-│   ├── frontend/
-│   └── backend/
-│
-└── platform/                    # Infrastructure
-    ├── infrastructure/          # IaC configs
-    └── environments/            # Environment configs
+└── platform/                          # Infrastructure
+    ├── infrastructure/
+    │   ├── docker/                    # Docker Compose + Dockerfile
+    │   └── terraform/                 # AWS VPC + RDS
+    ├── environments/                  # Mock servers, sandboxes
+    └── simulations/                   # Browser tests, load testing
 ```
+
+---
+
+## Orchestration Architecture (Node.js)
+
+### Request Flow
+
+```
+User Request
+  │
+  ▼
+TaskRouter.route(request)          ← Detects intent, selects workflow type
+  │
+  ▼
+WorkflowFactory.create(type)       ← Instantiates the correct *Flow class
+  │
+  ▼
+BaseWorkflow.execute(request)      ← Creates tasks, builds WorkflowState
+  │
+  ▼
+TeamLauncher.launch(template,      ← Executes tasks per team pattern:
+  workflow, tasks)                    sequential / parallel / adversarial
+  │
+  ▼
+AgentRunner.run(task)              ← Spawns agent via Claude Agent Teams
+  │                                   using .claude/ config + definitions/*.yaml
+  ▼
+MongoDB persistence                ← Task, AgentRun, TeamMessage, WorkflowState
+```
+
+### MongoDB Collections
+
+| Collection | Model | Purpose |
+|------------|-------|---------|
+| `tasks` | `core/models/Task.ts` | Individual task records with status, assignment, dependencies |
+| `agent_runs` | `core/models/AgentRun.ts` | Agent execution history with token usage and output |
+| `team_messages` | `core/models/TeamMessage.ts` | Inter-agent messages during workflows |
+| `workflow_state` | `core/models/WorkflowState.ts` | Workflow status, tasks, and context |
+
+### Team Execution Patterns
+
+| Pattern | Implementation | Used By |
+|---------|---------------|---------|
+| `sequential` | Tasks run one at a time in order | Release, UI Testing |
+| `parallel` | All tasks run simultaneously | Review |
+| `sequential_parallel` | Batch tasks by dependency level; each batch runs in parallel | Feature |
+| `adversarial` | Competing hypotheses in parallel, then synthesis | Debug, Research |
 
 ---
 
@@ -115,120 +216,79 @@ ai-dev-system/
 
 ### Agent Roles
 
-| Agent | Role | File Ownership |
-|-------|------|----------------|
-| **Architect** | System design, ADRs | `docs/architecture.md`, `knowledge/` |
-| **Planner** | Task breakdown, coordination | `docs/tasks/` |
-| **Frontend** | React/Next.js development | `apps/frontend/`, `saas-app/frontend/` |
-| **Backend** | API/service development | `apps/backend/`, `saas-app/backend/` |
-| **UI-Designer** | UI/UX design, design system | `docs/design/` |
-| **QA** | Test strategy, quality assurance | `tests/` |
-| **Tester** | Test implementation | `tests/` |
-| **Security** | Security audits | `docs/security/` |
-| **Reviewer** | Code review | Read-only |
-| **Debugger** | Bug analysis, fixes | Cross-codebase |
-| **DevOps** | CI/CD, deployment | `platform/infrastructure/` |
-| **Documentation** | Documentation | `docs/`, `README.md` |
+| Agent | Role | File Ownership | Implementation |
+|-------|------|----------------|----------------|
+| **Architect** | System design, ADRs | `docs/architecture.md`, `knowledge/` | `architect/agent.ts` |
+| **Planner** | Task breakdown | `docs/tasks/`, `core/agents/teams/` | `project_manager/agent.ts` |
+| **Frontend** | React/Next.js | `apps/frontend/`, `saas-app/frontend/` | `frontend_agent/agent.ts` |
+| **Backend** | Express/MongoDB APIs | `apps/backend/`, `saas-app/backend/` | `backend_agent/agent.ts` |
+| **Tester** | Jest/Playwright tests | `tests/`, `platform/simulations/` | `testing_agent/agent.ts` |
+| **Debugger** | Root-cause analysis | Cross-codebase write | `debug_agent/agent.ts` |
+| **Reviewer** | Code quality review | Read-only | `review_agent/agent.ts` |
+| **DevOps** | Docker, Terraform, CI/CD | `platform/infrastructure/` | `deploy_agent/agent.ts` |
+| **Documentation** | Technical writing | `docs/`, `README.md` | `docs_agent/agent.ts` |
 
-### Agent Definition Structure
+### Agent Implementation Structure
 
-Each agent is defined in `.agents/<name>.yaml`:
+Each agent in `core/agents/implementations/<name>/` contains:
 
-```yaml
-name: agent-name
-role: Role Title
-description: What the agent does
+| File | Purpose |
+|------|---------|
+| `agent.ts` | Definition (name, model, permissions), system prompt, execute function |
+| `tools.ts` | Tool descriptors with allowed paths and commands |
+| `prompts.md` | Prompt templates for different task types |
+| `README.md` | Documentation of the agent's purpose and capabilities |
 
-model:
-  primary: claude-sonnet-4-20250514
-  fallback: gpt-4o
-  temperature: 0.3
+### Claude Agent Teams Integration
 
-capabilities:
-  - capability_1
-  - capability_2
+The orchestration layer integrates with Claude Agent Teams via:
 
-responsibilities:
-  - Responsibility 1
-  - Responsibility 2
-
-collaboration:
-  works_with:
-    - other_agent
-  receives_from:
-    - upstream_agent
-  sends_to:
-    - downstream_agent
-
-permissions:
-  read: all
-  write:
-    - owned/directory/**
-  execute: false
-
-prompts:
-  system: |
-    System prompt for the agent
-
-tasks:
-  - task_1
-  - task_2
-
-dependencies:
-  - dependent_agent
-```
+1. **`.claude/settings.json`** — Global Agent Teams configuration
+2. **`core/agents/definitions/*.yaml`** — Per-agent model, tools, and permissions read by Claude Code
+3. **`core/agents/teams/*.md`** — Team templates with spawn prompts and communication protocols
+4. **`.claude/commands/*.md`** — Slash commands that trigger team workflows
+5. **`AgentRunner`** — Calls the Claude Code SDK to spawn agents with their definitions
 
 ---
 
 ## Team Patterns
 
-### Feature Team
-Sequential + parallel execution for building features.
-
+### Feature Team (sequential_parallel)
 ```
-Architect → Planner ─┬─ Frontend ─┬─ QA → Reviewer
-                     └─ Backend  ─┘
+Architect designs → Frontend + Backend in parallel → Tester validates → Reviewer audits
 ```
 
-### Debug Team
-Adversarial investigation with multiple hypotheses.
-
+### Debug Team (adversarial)
 ```
-┌─ Investigator A ─┐
-├─ Investigator B ─┼─ Challenge ─ Synthesis
-└─ Investigator C ─┘
+Investigator A (logic) ─┐
+Investigator B (state)  ├─ adversarial debate → Lead synthesizes fix
+Investigator C (deps)   ─┘
 ```
 
-### Review Team
-Parallel multi-lens code review.
-
+### Review Team (parallel)
 ```
-┌─ Security Review  ─┐
-├─ Quality Review   ─┼─ Summary
-└─ Coverage Review  ─┘
+Security Review   ─┐
+Performance Review ├─ Lead deduplicates → combined report
+Coverage Review   ─┘
 ```
 
-### Release Team
-Sequential deployment with validation.
-
+### Release Team (sequential)
 ```
-DevOps → QA Validation → Deploy → Health Check
+DevOps deploys → QA validates → rollback if failed
 ```
 
 ---
 
 ## Workflow Invocation
 
-Workflows are invoked via slash commands:
-
-| Command | Team | Description |
-|---------|------|-------------|
-| `/build-feature <name>` | Feature | Build a new feature |
-| `/debug-bug <description>` | Debug | Investigate and fix a bug |
-| `/code-review` | Review | Multi-lens code review |
-| `/deploy-app --env staging` | Release | Deploy to environment |
-| `/run-tests --type unit` | Test | Run test suite |
-| `/research-tech <topic>` | Research | Technology evaluation |
+| Command | Workflow Class | Team Pattern |
+|---------|---------------|--------------|
+| `/build-feature <name>` | `DevelopmentFlow` | sequential_parallel |
+| `/debug-bug <desc>` | `DebugFlow` | adversarial |
+| `/code-review` | (Review team) | parallel |
+| `/deploy-app --env staging` | `ReleaseFlow` | sequential |
+| `/research-tech <topic>` | `ResearchFlow` | adversarial |
+| `/run-tests --type e2e` | `UiTestingFlow` | sequential |
 
 ---
 
@@ -237,31 +297,33 @@ Workflows are invoked via slash commands:
 ### Knowledge Base (`knowledge/`)
 - `architecture.md` — Architecture decisions and patterns
 - `coding_standards.md` — Project coding standards
-- `lessons_learned.md` — Documented learnings
+- `lessons_learned.md` — Documented learnings from debug workflows
 - `project_context.md` — Project context and goals
 
 ### Context Files
 - `CLAUDE.md` — Master context loaded by all Claude instances
-- `.claude/project_context.md` — Persistent project context
+- `.claude/project_context.md` — Persistent project context for Agent Teams
+- `.github/copilot-instructions.md` — Architecture context for GitHub Copilot
 
 ---
 
 ## File Ownership Rules
 
-1. **Each agent owns specific directories** — prevents conflicts
-2. **No overlapping writes** — agents cannot edit same files
+1. **Each agent owns specific directories** — prevents write conflicts
+2. **No overlapping writes** — agents cannot edit the same files
 3. **Read access is global** — all agents can read all files
 4. **Reviewer is read-only** — analysis only, no writes
+5. **Debugger is the exception** — cross-codebase write for bug fixes
 
 ---
 
 ## Configuration
 
 ### Agent Configuration (`configs/agents.yaml`)
-Model settings, team configurations, and defaults.
+Model settings, team member lists, and execution defaults.
 
 ### Model Configuration (`configs/model_config.yaml`)
-LLM provider settings, fallback chains, and cost limits.
+LLM provider settings, fallback chains (Opus → GPT-4o → GPT-4o-mini), and cost limits ($50/day, $5/task).
 
 ### Environment Configuration (`configs/environment.yaml`)
 Environment-specific settings for dev/staging/production.

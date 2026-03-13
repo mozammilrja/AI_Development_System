@@ -4,62 +4,62 @@
 # Agent definitions (roles, capabilities, collaboration rules) are in .agents/*.yaml
 
 defaults:
-  model: claude-sonnet-4-20250514
+  model: claude-opus-4-20250514
   temperature: 0.3
   max_tokens: 8192
 
 agents:
   # Core Development Team
   architect:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.3
     priority: high
 
   planner:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.3
     priority: high
 
   frontend:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.4
 
   backend:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.3
 
   ui-designer:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.5
 
   # Quality & Review Team
   qa:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.2
 
   tester:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.2
 
   reviewer:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.2
 
   security:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.2
 
   # Support Team
   debugger:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.2
 
   devops:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.2
 
   documentation:
-    model: claude-sonnet-4-20250514
+    model: claude-opus-4-20250514
     temperature: 0.4
 
 # Team configurations

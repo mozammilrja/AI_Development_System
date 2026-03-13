@@ -1,5 +1,59 @@
 # Debug Investigation Team Template
 
+## Team Goal
+
+Identify the root cause of a bug through adversarial investigation. Three independent investigators form competing hypotheses, actively challenge each other's theories, and the lead synthesizes the winning explanation into a verified fix — preventing anchoring bias and ensuring the true cause is found.
+
+## Team Members
+
+| # | Agent | Role on Team |
+|---|-------|--------------|
+| 1 | Investigator A | Logic-error hypothesis investigator |
+| 2 | Investigator B | State/data-issue hypothesis investigator |
+| 3 | Investigator C | Integration/dependency hypothesis investigator |
+
+All three are instances of the **Debugger** agent with different focus areas.
+
+## Responsibilities
+
+| Agent | Must Do | Must NOT Do |
+|-------|---------|-------------|
+| Investigator A | Trace code logic, find algorithm/conditional errors, disprove B & C | Apply a fix (investigation only) |
+| Investigator B | Analyze state mutations, race conditions, caching, disprove A & C | Apply a fix (investigation only) |
+| Investigator C | Check API contracts, configs, dependency versions, disprove A & B | Apply a fix (investigation only) |
+| Lead (post-debate) | Synthesize winning theory, write fix, run tests, document lesson | — |
+
+## File Ownership
+
+| Agent | Writable Paths |
+|-------|----------------|
+| Investigators A/B/C | Cross-codebase read; no writes during investigation |
+| Lead (fix phase) | Cross-codebase write to apply the fix |
+| Lead (docs) | `knowledge/lessons_learned.md` |
+
+During investigation, no agent writes code. The fix is applied only after debate resolution.
+
+## Communication Rules
+
+1. **Investigators ↔ Investigators**: Must share evidence via messages as they discover it — not just at the end.
+2. **Adversarial obligation**: Each investigator must explicitly attempt to disprove the other two theories.
+3. **Confidence reporting**: Each investigator reports confidence (low/medium/high) as evidence accumulates.
+4. **Lead ← All**: Lead reviews all messages exchanged to determine which hypothesis survived.
+5. **Lead → Investigators**: No feedback during investigation; lead only acts after all three finish.
+
+## Task Flow
+
+```
+1. Investigator A (logic)       ──┐
+2. Investigator B (state/data)  ──┼── parallel, messaging each other
+3. Investigator C (integration) ──┘
+         │
+4. Lead reviews debate evidence
+5. Lead writes fix based on winning theory
+6. Lead runs tests to validate
+7. Lead documents root cause in knowledge/lessons_learned.md
+```
+
 ## Team Structure
 - **Team size**: 3 teammates
 - **Pattern**: Parallel competing hypotheses with adversarial debate

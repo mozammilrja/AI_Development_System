@@ -3,7 +3,7 @@ role: QA Engineer
 description: Writes and executes tests across all layers (unit, integration, E2E).
 
 model:
-  primary: claude-sonnet-4-20250514
+  primary: claude-opus-4-20250514
   fallback: gpt-4o-mini
   temperature: 0.2
 

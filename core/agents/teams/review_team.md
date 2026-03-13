@@ -1,5 +1,57 @@
 # Code Review Team Template
 
+## Team Goal
+
+Perform a comprehensive, multi-perspective code review by running three independent reviewers in parallel — each focused on a different quality dimension (security, performance, test coverage). The lead deduplicates and prioritizes findings into a single actionable report.
+
+## Team Members
+
+| # | Agent | Role on Team |
+|---|-------|--------------|
+| 1 | Security Reviewer | Scans for vulnerabilities, auth flaws, injection risks |
+| 2 | Performance Reviewer | Finds N+1 queries, memory leaks, blocking I/O, missing caching |
+| 3 | Test Coverage Reviewer | Identifies untested paths, missing edge-case tests, coverage gaps |
+
+## Responsibilities
+
+| Agent | Must Do | Must NOT Do |
+|-------|---------|-------------|
+| Security Reviewer | Check OWASP Top 10, auth/authz, input validation, secrets, CVEs | Edit source files |
+| Performance Reviewer | Check query efficiency, async correctness, memory, hot paths | Edit source files |
+| Coverage Reviewer | Run coverage tools, identify untested paths, suggest test cases | Edit source files |
+| Lead | Deduplicate, sort by severity, produce combined report | Edit source files |
+
+## File Ownership
+
+| Agent | Writable Paths |
+|-------|----------------|
+| Security Reviewer | None (read-only) |
+| Performance Reviewer | None (read-only) |
+| Coverage Reviewer | None (read-only) |
+| Lead | None (read-only; report delivered as output) |
+
+The entire review team is **read-only**. No files are modified during review.
+
+## Communication Rules
+
+1. **No cross-talk**: Reviewers work independently — they do not message each other.
+2. **Structured output**: Each reviewer rates findings as Critical / High / Medium / Low.
+3. **Reviewers → Lead**: Findings delivered as structured reports when each reviewer finishes.
+4. **Lead → Requester**: Combined report with deduplicated, severity-sorted action items.
+5. **Scope boundary**: Each reviewer stays in their lane (security / performance / coverage).
+
+## Task Flow
+
+```
+1. Security Reviewer   ──┐
+2. Performance Reviewer ──┼── all parallel, no dependencies
+3. Coverage Reviewer    ──┘
+         │
+4. Lead deduplicates and merges findings
+5. Lead sorts by severity (Critical → Low)
+6. Lead delivers combined review report
+```
+
 ## Team Structure
 - **Team size**: 3 teammates
 - **Pattern**: Fully parallel, independent reviewers with different lenses

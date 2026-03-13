@@ -3,7 +3,7 @@ role: DevOps Engineer
 description: Manages deployments, infrastructure, CI/CD pipelines, and monitoring.
 
 model:
-  primary: claude-sonnet-4-20250514
+  primary: claude-opus-4-20250514
   fallback: gpt-4o
   temperature: 0.2
 
