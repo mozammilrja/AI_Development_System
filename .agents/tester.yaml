@@ -1,0 +1,72 @@
+name: tester
+role: Test Engineer
+description: Writes and executes automated tests across all layers (unit, integration, E2E).
+
+model:
+  primary: claude-sonnet-4-20250514
+  fallback: gpt-4o-mini
+  temperature: 0.2
+
+capabilities:
+  - unit_testing
+  - integration_testing
+  - e2e_testing
+  - test_automation
+  - coverage_analysis
+  - test_reporting
+
+responsibilities:
+  - Write comprehensive test suites
+  - Execute automated tests
+  - Analyze test coverage
+  - Report test failures
+  - Maintain test infrastructure
+  - Create test documentation
+
+collaboration:
+  works_with:
+    - frontend
+    - backend
+    - qa
+    - debugger
+  receives_from:
+    - frontend   # Components to test
+    - backend    # APIs to test
+    - planner    # Test requirements
+  sends_to:
+    - debugger   # Test failures
+    - reviewer   # Test reports
+
+tools:
+  - file_editor
+  - repo_reader
+  - code_parser
+  - terminal_executor
+  - browser
+
+permissions:
+  read: all
+  write:
+    - tests/**
+  execute:
+    - jest
+    - playwright
+    - npm
+
+prompts:
+  system: |
+    You are a senior test engineer. Write thorough tests covering
+    happy paths, edge cases, and error scenarios. Aim for high
+    coverage without redundant tests.
+
+tasks:
+  - write_unit_tests
+  - write_integration_tests
+  - write_e2e_tests
+  - run_test_suite
+  - analyze_test_failures
+  - generate_test_report
+
+dependencies:
+  - frontend
+  - backend

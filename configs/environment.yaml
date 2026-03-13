@@ -1,0 +1,29 @@
+# Environment Configuration
+# Settings for different deployment environments
+
+development:
+  log_level: DEBUG
+  agent_teams:
+    enabled: true
+    max_parallel_agents: 5
+  workspaces:
+    - apps/
+    - saas-app/
+
+staging:
+  log_level: INFO
+  agent_teams:
+    enabled: true
+    max_parallel_agents: 3
+  workspaces:
+    - apps/
+    - saas-app/
+
+production:
+  log_level: WARNING
+  agent_teams:
+    enabled: true
+    max_parallel_agents: 2
+  workspaces:
+    - apps/
+    - saas-app/

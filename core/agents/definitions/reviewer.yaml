@@ -1,0 +1,37 @@
+name: reviewer
+role: Code Reviewer
+description: Reviews code changes for quality, security, and best practices.
+
+model:
+  primary: claude-sonnet-4-20250514
+  fallback: gpt-4o
+  temperature: 0.2
+
+skills:
+  - code-review
+
+tools:
+  - repo_reader
+  - code_parser
+  - git_manager
+
+permissions:
+  read: all
+  write: false
+  execute: false
+
+prompts:
+  system: |
+    You are a senior code reviewer. Review code with a focus on
+    correctness, security, performance, and maintainability.
+    Provide actionable feedback with specific suggestions.
+    Rate issues by severity: critical, high, medium, low.
+
+tasks:
+  - review_pull_request
+  - review_code_change
+  - security_audit
+  - performance_review
+  - style_compliance_check
+
+dependencies: []

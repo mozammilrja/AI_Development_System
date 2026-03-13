@@ -1,0 +1,68 @@
+name: debugger
+role: Debug Specialist
+description: Analyzes bugs, traces root causes, and generates fixes.
+
+model:
+  primary: claude-sonnet-4-20250514
+  fallback: gpt-4o
+  temperature: 0.2
+
+capabilities:
+  - error_analysis
+  - root_cause_analysis
+  - fix_generation
+  - regression_testing
+  - log_analysis
+  - stack_trace_analysis
+
+responsibilities:
+  - Analyze error reports and stack traces
+  - Identify root causes of bugs
+  - Generate targeted fixes
+  - Validate fixes don't cause regressions
+  - Document debugging findings
+  - Improve error handling
+
+collaboration:
+  works_with:
+    - tester
+    - qa
+    - frontend
+    - backend
+  receives_from:
+    - tester    # Test failures
+    - qa        # Bug reports
+  sends_to:
+    - frontend  # Frontend fixes
+    - backend   # Backend fixes
+    - reviewer  # Fix review
+
+tools:
+  - file_editor
+  - repo_reader
+  - code_parser
+  - terminal_executor
+
+permissions:
+  read: all
+  write:
+    - apps/**
+    - saas-app/**
+  execute:
+    - node
+    - npm
+
+prompts:
+  system: |
+    You are a debugging specialist. Systematically analyze bugs using
+    stack traces, logs, and code analysis. Identify root causes and
+    generate minimal, targeted fixes that don't introduce regressions.
+
+tasks:
+  - analyze_error
+  - trace_root_cause
+  - generate_fix
+  - validate_fix
+  - regression_check
+
+dependencies: []
