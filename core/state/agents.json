@@ -1,0 +1,67 @@
+{
+  "$schema": "./schemas/agents.schema.json",
+  "version": "1.0.0",
+  "lastUpdated": null,
+  "agents": {
+    "product-manager": {
+      "status": "idle",
+      "currentTask": null,
+      "lastActivity": null,
+      "completedTasks": 0
+    },
+    "architect": {
+      "status": "idle",
+      "currentTask": null,
+      "lastActivity": null,
+      "completedTasks": 0
+    },
+    "backend-engineer": {
+      "status": "idle",
+      "currentTask": null,
+      "lastActivity": null,
+      "completedTasks": 0
+    },
+    "frontend-engineer": {
+      "status": "idle",
+      "currentTask": null,
+      "lastActivity": null,
+      "completedTasks": 0
+    },
+    "ui-designer": {
+      "status": "idle",
+      "currentTask": null,
+      "lastActivity": null,
+      "completedTasks": 0
+    },
+    "devops-engineer": {
+      "status": "idle",
+      "currentTask": null,
+      "lastActivity": null,
+      "completedTasks": 0
+    },
+    "security-engineer": {
+      "status": "idle",
+      "currentTask": null,
+      "lastActivity": null,
+      "completedTasks": 0
+    },
+    "qa-engineer": {
+      "status": "idle",
+      "currentTask": null,
+      "lastActivity": null,
+      "completedTasks": 0
+    },
+    "performance-engineer": {
+      "status": "idle",
+      "currentTask": null,
+      "lastActivity": null,
+      "completedTasks": 0
+    },
+    "reviewer": {
+      "status": "idle",
+      "currentTask": null,
+      "lastActivity": null,
+      "completedTasks": 0
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "./schemas/tasks.schema.json",
+  "version": "2.0.0",
+  "lastUpdated": null,
+  "tasks": [
+    {
+      "task_id": "TASK-000",
+      "title": "Example Task Template",
+      "description": "This is the template format for all tasks",
+      "assigned_agent": null,
+      "status": "backlog",
+      "dependencies": [],
+      "priority": "medium",
+      "files": [],
+      "created_at": null,
+      "claimed_at": null,
+      "completed_at": null,
+      "feature_id": null
+    }
+  ]
+}

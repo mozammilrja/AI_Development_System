@@ -1,0 +1,8 @@
+# Production Namespace
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai-dev-production
+  labels:
+    environment: production

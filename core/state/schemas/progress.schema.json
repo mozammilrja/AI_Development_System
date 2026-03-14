@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "progress.schema.json",
+  "title": "Progress State",
+  "description": "Schema for tracking feature completion in the AI development system",
+  "type": "object",
+  "required": ["version", "features", "summary"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "lastUpdated": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Feature"
+      }
+    },
+    "summary": {
+      "$ref": "#/definitions/Summary"
+    }
+  },
+  "definitions": {
+    "Feature": {
+      "type": "object",
+      "required": ["id", "name", "status", "createdAt"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique feature identifier (e.g., FEAT-001)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Feature name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Feature description"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in-progress", "blocked", "review", "completed", "cancelled"],
+          "description": "Overall feature status"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "default": "medium"
+        },
+        "phases": {
+          "type": "object",
+          "properties": {
+            "design": {
+              "$ref": "#/definitions/PhaseStatus"
+            },
+            "backend": {
+              "$ref": "#/definitions/PhaseStatus"
+            },
+            "frontend": {
+              "$ref": "#/definitions/PhaseStatus"
+            },
+            "testing": {
+              "$ref": "#/definitions/PhaseStatus"
+            },
+            "security": {
+              "$ref": "#/definitions/PhaseStatus"
+            },
+            "review": {
+              "$ref": "#/definitions/PhaseStatus"
+            }
+          }
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Task IDs belonging to this feature"
+        },
+        "completionPercentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "assignedAgents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Agents working on this feature"
+        },
+        "deliverables": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Deliverable"
+          }
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Current blockers"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "startedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "PhaseStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in-progress", "completed", "skipped"]
+        },
+        "agent": {
+          "type": ["string", "null"]
+        },
+        "completedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "Deliverable": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "File path"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["code", "test", "docs", "config", "design"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "created", "updated", "reviewed"]
+        },
+        "agent": {
+          "type": "string"
+        }
+      }
+    },
+    "Summary": {
+      "type": "object",
+      "properties": {
+        "totalFeatures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "inProgress": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pending": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blocked": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

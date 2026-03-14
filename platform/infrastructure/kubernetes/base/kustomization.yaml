@@ -1,0 +1,13 @@
+# Kustomization - Base Resources
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - backend.yaml
+  - frontend.yaml
+  - ingress.yaml
+
+commonLabels:
+  app.kubernetes.io/name: ai-dev-system
+  app.kubernetes.io/managed-by: kustomize

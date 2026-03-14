@@ -1,15 +1,48 @@
-# Tests
+# tests/
 
-This directory contains all test suites for the AI Development System.
+## Purpose
+
+Test suites for the AI development system and built applications.
+
+## Ownership
+
+**QA Engineer Agent** has primary ownership of this directory.
+
+## Contents
+
+- **unit/**: Unit tests
+- **integration/**: Integration tests
+- **e2e/**: End-to-end tests
+- **benchmarks/**: Performance benchmarks
+- **security/**: Security tests
 
 ## Structure
 
 ```
 tests/
-├── unit/           — Unit tests for individual modules
-├── integration/    — Integration tests for service boundaries
-└── e2e/            — End-to-end tests using Playwright
+├── unit/
+│   ├── backend/
+│   └── frontend/
+├── integration/
+│   └── api/
+├── e2e/
+│   └── flows/
+├── benchmarks/
+│   └── *.bench.ts
+├── security/
+│   └── *.security.ts
+└── fixtures/
+    └── test-data/
 ```
+
+## Testing Strategy
+
+| Test Type | Scope | Tools |
+|-----------|-------|-------|
+| Unit | Individual functions | Jest |
+| Integration | Service interactions | Jest + Supertest |
+| E2E | Full user flows | Playwright |
+| Security | Vulnerabilities | Custom + OWASP |
 
 ## Running Tests
 
@@ -17,27 +50,12 @@ tests/
 # All tests
 npm test
 
-# Unit tests only
-npx jest --testPathPattern=unit --verbose
+# Unit tests
+npm run test:unit
 
-# Integration tests only
-npx jest --testPathPattern=integration --verbose
+# Integration tests
+npm run test:integration
 
 # E2E tests
-npx playwright test
-
-# Coverage report
-npx jest --coverage
+npm run test:e2e
 ```
-
-## Conventions
-
-- Test files: `<module>.test.ts` or `<module>.spec.ts`
-- Co-locate unit tests near the code they test, or place in `tests/unit/`
-- Integration tests go in `tests/integration/`
-- E2E tests go in `tests/e2e/`
-
-## Ownership
-
-- **QA agent**: defines test strategy and acceptance criteria
-- **Tester agent**: writes and executes test code

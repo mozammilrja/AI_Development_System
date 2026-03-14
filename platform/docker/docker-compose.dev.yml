@@ -1,0 +1,123 @@
+# Docker Compose - Development Environment
+# Usage: docker-compose up -d
+
+version: "3.9"
+
+services:
+  # ============================================
+  # Backend API Service
+  # ============================================
+  backend:
+    build:
+      context: ../../
+      dockerfile: platform/docker/backend.Dockerfile
+      target: production
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=mongodb://mongo:27017/ai_dev_system
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../../services/backend/src:/app/services/backend/src:ro  # Dev: hot reload
+    restart: unless-stopped
+    networks:
+      - ai-dev-network
+
+  # ============================================
+  # Frontend Web Application
+  # ============================================
+  frontend:
+    build:
+      context: ../../
+      dockerfile: platform/docker/frontend.Dockerfile
+      target: production
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - API_URL=http://backend:8000
+    depends_on:
+      - backend
+    volumes:
+      - ../../services/frontend/src:/app/services/frontend/src:ro  # Dev: hot reload
+    restart: unless-stopped
+    networks:
+      - ai-dev-network
+
+  # ============================================
+  # MongoDB Database
+  # ============================================
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: ai_dev_system
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ai-dev-network
+
+  # ============================================
+  # Redis Cache
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ai-dev-network
+
+  # ============================================
+  # Nginx Reverse Proxy (Optional)
+  # ============================================
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+    profiles:
+      - with-proxy
+    networks:
+      - ai-dev-network
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  ai-dev-network:
+    driver: bridge
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  mongo-data:
+  redis-data:

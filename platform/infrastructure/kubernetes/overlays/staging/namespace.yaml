@@ -1,0 +1,8 @@
+# Staging Namespace
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai-dev-staging
+  labels:
+    environment: staging

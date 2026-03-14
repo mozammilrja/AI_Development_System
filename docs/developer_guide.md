@@ -1,262 +1,486 @@
 # Developer Guide
 
+This guide explains how to set up, use, and extend the AI Development System.
+
+---
+
+## Table of Contents
+
+1. [Getting Started](#getting-started)
+2. [Repository Structure](#repository-structure)
+3. [Agent System](#agent-system)
+4. [Commands](#commands)
+5. [Task Management](#task-management)
+6. [Development Workflow](#development-workflow)
+7. [Adding Components](#adding-components)
+8. [Testing](#testing)
+9. [Best Practices](#best-practices)
+
+---
+
 ## Getting Started
 
 ### Prerequisites
-- [Claude Code](https://claude.ai/code) — VS Code extension or CLI
-- Node.js 20+ (for development)
-- Git
 
-### Setup
+- **Claude Code** — VS Code extension or CLI
+- **Node.js 20+** — Runtime environment
+- **Git** — Version control
+- **Docker** — Container runtime (optional, for local services)
 
-1. **Clone the repository**
-   ```bash
-   git clone <repo-url> ai-dev-system
-   cd ai-dev-system
-   ```
+### Installation
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+```bash
+# Clone the repository
+git clone <repo-url> ai-dev-system
+cd ai-dev-system
 
-3. **Open in Claude Code**
-   - Open the project in VS Code with Claude Code extension
+# Install dependencies
+npm install
+
+# Verify setup
+npm run verify
+```
+
+### Quick Start
+
+1. **Open in Claude Code**
+   - Open project in VS Code with Claude Code extension
    - Or use Claude Code CLI
 
-4. **Verify setup**
-   - Check agent definitions in `.agents/`
-   - Verify command files in `.claude/commands/`
+2. **Run a command**
+   ```bash
+   /build-feature user-authentication
+   ```
+
+3. **Monitor progress**
+   - Watch `core/state/progress.json`
+   - Check `core/tasks/in-progress.md`
 
 ---
 
-## Project Structure
+## Repository Structure
 
 ```
-ai-development-system/
-├── .agents/           # 10 agent role definitions (YAML)
-├── .claude/           # Claude Code configuration
-│   └── commands/      # Slash commands
-├── .agent-status/     # Agent status tracking (JSON)
-├── core/              # Orchestration logic (TypeScript)
-│   ├── orchestrator/  # Agent execution engine
-│   ├── services/      # Team launcher, task router
-│   └── workflows/     # Workflow definitions
-├── services/          # Application code
-│   ├── backend/       # Backend (Backend Engineer)
-│   └── frontend/      # Frontend (Frontend Engineer)
-├── ui/                # UI designs (UI Designer)
-├── security/          # Security configs (Security Engineer)
-├── tests/benchmarks/       # Performance tools (Performance Engineer)
-├── reviews/           # Code reviews (Code Reviewer)
-├── tests/             # Tests (QA Engineer)
-├── platform/          # Infrastructure (DevOps Engineer)
-├── docs/              # Documentation
-└── docs/knowledge/         # Knowledge base
+AI_Development_System/
+├── .agents/                   # Agent role definitions
+│   ├── architect.agent.md
+│   ├── backend-engineer.agent.md
+│   ├── frontend-engineer.agent.md
+│   ├── ui-designer.agent.md
+│   ├── devops-engineer.agent.md
+│   ├── security-engineer.agent.md
+│   ├── qa-engineer.agent.md
+│   ├── performance-engineer.agent.md
+│   ├── product-manager.agent.md
+│   └── reviewer.agent.md
+│
+├── .claude/                   # Claude Code configuration
+│   ├── commands/              # Workflow commands
+│   │   ├── build-feature.md
+│   │   ├── code-review.md
+│   │   ├── deploy-app.md
+│   │   ├── fix-bug.md
+│   │   ├── write-tests.md
+│   │   ├── security-audit.md
+│   │   └── optimize-performance.md
+│   └── settings.json
+│
+├── core/                      # Orchestration engine
+│   ├── orchestration/         # Workflow documentation
+│   ├── state/                 # State management (JSON)
+│   │   ├── tasks.json         # Task registry
+│   │   ├── agents.json        # Agent status
+│   │   └── progress.json      # Build progress
+│   └── tasks/                 # Task board (Markdown)
+│       ├── backlog.md
+│       ├── in-progress.md
+│       └── completed.md
+│
+├── services/                  # Application code
+│   ├── backend/               # Backend API
+│   └── frontend/              # Frontend app
+│
+├── ui/                        # Design system
+├── security/                  # Security policies
+├── tests/                     # Test suites
+├── platform/                  # Infrastructure
+├── knowledge/                 # Engineering knowledge base
+└── docs/                      # Documentation
 ```
 
 ---
 
-## The 10-Agent Team
+## Agent System
 
-| Agent | Owns | Does |
-|-------|------|------|
-| **Product Manager** | `docs/product.md`, `docs/user-stories/` | Requirements, user stories |
-| **Architect** | `docs/architecture.md`, `docs/api-contracts/` | System design, APIs |
-| **Backend Engineer** | `app/backend/` | APIs, services, database |
-| **Frontend Engineer** | `app/frontend/` | React components, pages |
-| **UI Designer** | `ui/` | Component specs, design tokens |
-| **DevOps Engineer** | `platform/`, `.github/` | CI/CD, infrastructure |
-| **Security Engineer** | `security/` | Security audits |
-| **QA Engineer** | `tests/` | Unit, integration, E2E tests |
-| **Performance Engineer** | `tests/benchmarks/` | Benchmarks, load tests |
-| **Code Reviewer** | `reviews/` | Code review (read-only audit) |
+### The 10-Agent Team
+
+| # | Agent | Role | Owned Directories |
+|---|-------|------|-------------------|
+| 1 | **Product Manager** | Requirements & user stories | `knowledge/product.md` |
+| 2 | **Architect** | System design & API contracts | `docs/architecture.md` |
+| 3 | **Backend Engineer** | APIs, services, database | `services/backend/` |
+| 4 | **Frontend Engineer** | React components, pages | `services/frontend/` |
+| 5 | **UI Designer** | Design system, tokens | `ui/` |
+| 6 | **DevOps Engineer** | CI/CD, infrastructure | `platform/` |
+| 7 | **Security Engineer** | Security audits, policies | `security/` |
+| 8 | **QA Engineer** | Unit, integration, E2E tests | `tests/` |
+| 9 | **Performance Engineer** | Benchmarks, profiling | `tests/benchmarks/` |
+| 10 | **Code Reviewer** | Final review (read-only) | `reviews/` |
+
+### Agent Definition Format
+
+Each agent is defined in `.agents/<name>.agent.md`:
+
+```markdown
+# Agent Name
+
+## Role
+Description of the agent's responsibility.
+
+## Responsibilities
+- Primary task 1
+- Primary task 2
+
+## Owned Directories
+| Directory | Purpose |
+|-----------|---------|
+| `path/` | Description |
+
+## Collaboration Rules
+### Reads From
+- Source files and dependencies
+
+### Writes To
+- Output destinations
+```
 
 ---
 
-## Running Commands
+## Commands
 
-### Build a Feature
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `/build-feature <name>` | Build complete feature with all 10 agents |
+| `/code-review` | Multi-perspective parallel code review |
+| `/deploy-app --env <env>` | Deploy to staging or production |
+| `/fix-bug <description>` | Debug and fix an issue |
+| `/write-tests` | Generate comprehensive test suite |
+| `/security-audit` | Run security vulnerability scan |
+| `/optimize-performance` | Analyze and optimize performance |
+
+### Using Commands
 
 ```bash
-/build-feature <feature-description>
-```
-
-This spawns all 10 agents simultaneously to build the feature.
-
-**Example:**
-```bash
+# Build a new feature
 /build-feature user-authentication with JWT tokens
+
+# Review code changes
+/code-review
+
+# Deploy to staging
+/deploy-app --env staging
+
+# Fix a bug
+/fix-bug "Login fails with special characters"
+
+# Generate tests
+/write-tests
+
+# Run security scan
+/security-audit
+
+# Optimize performance
+/optimize-performance
 ```
 
-### Code Review
+---
+
+## Task Management
+
+### Task Board
+
+Tasks flow through three states:
+
+```
+┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
+│    BACKLOG      │ ───► │   IN-PROGRESS   │ ───► │   COMPLETED     │
+│  (backlog.md)   │      │(in-progress.md) │      │ (completed.md)  │
+└─────────────────┘      └─────────────────┘      └─────────────────┘
+```
+
+### Task Format
+
+```markdown
+## TASK-001: Task Title
+
+- **Feature:** FEAT-001
+- **Agent:** architect
+- **Priority:** high
+- **Status:** in-progress
+- **Created:** 2026-03-14T10:00:00Z
+
+### Description
+Design the authentication system architecture.
+
+### Acceptance Criteria
+- [ ] API contract defined
+- [ ] Data models specified
+- [ ] Security considerations documented
+```
+
+### State Files
+
+**`core/state/tasks.json`** — Machine-readable task registry:
+```json
+{
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "Design authentication",
+      "assignedTo": "architect",
+      "status": "completed"
+    }
+  ]
+}
+```
+
+**`core/state/agents.json`** — Agent status:
+```json
+{
+  "agents": {
+    "architect": {
+      "status": "active",
+      "currentTask": "TASK-002"
+    }
+  }
+}
+```
+
+**`core/state/progress.json`** — Feature progress:
+```json
+{
+  "features": {
+    "FEAT-001": {
+      "name": "User Authentication",
+      "status": "in-progress",
+      "phases": {
+        "architecture": "completed",
+        "implementation": "in-progress"
+      }
+    }
+  }
+}
+```
+
+---
+
+## Development Workflow
+
+### 1. Feature Development
+
+1. **Invoke command**
+   ```bash
+   /build-feature <feature-description>
+   ```
+
+2. **Tasks created**
+   - Tasks added to `core/tasks/backlog.md`
+   - State updated in `core/state/tasks.json`
+
+3. **Agents work in parallel**
+   - Each agent claims their task
+   - Moves to `in-progress.md`
+   - Works autonomously
+
+4. **Coordination via files**
+   - Agents read each other's outputs
+   - No direct messaging
+
+5. **Completion**
+   - Tasks move to `completed.md`
+   - Final report generated
+
+### 2. Code Review
 
 ```bash
 /code-review
 ```
 
-Runs parallel multi-perspective review.
+Reviews from multiple perspectives:
+- Security vulnerabilities
+- Code quality standards
+- Performance implications
+- Test coverage
 
-### Deploy
+### 3. Deployment
 
 ```bash
 /deploy-app --env staging
 /deploy-app --env production
 ```
 
-### Run Tests
+Stages:
+1. Build and package
+2. Run pre-deployment tests
+3. Deploy to environment
+4. Run smoke tests
+5. Validate deployment
+
+---
+
+## Adding Components
+
+### Adding a New Agent
+
+1. **Create agent definition**
+
+   Create `.agents/<agent-name>.agent.md`:
+
+   ```markdown
+   # Agent Name
+
+   ## Role
+   Description of responsibility.
+
+   ## Responsibilities
+   - Task 1
+   - Task 2
+
+   ## Owned Directories
+   | Directory | Purpose |
+   |-----------|---------|
+   | `my-path/` | Description |
+
+   ## Collaboration Rules
+   ### Reads From
+   - Input sources
+
+   ### Writes To
+   - Output destinations
+   ```
+
+2. **Create owned directory**
+
+   ```bash
+   mkdir -p my-path
+   echo "# My Directory" > my-path/README.md
+   ```
+
+3. **Update documentation**
+
+   Add agent to relevant docs (architecture.md, workflow.md).
+
+### Adding a New Command
+
+1. **Create command file**
+
+   Create `.claude/commands/<command-name>.md`:
+
+   ```markdown
+   # Command Name
+
+   Execute: **$ARGUMENTS**
+
+   ---
+
+   ## Agents
+
+   | Agent | Task |
+   |-------|------|
+   | agent-1 | Do X |
+   | agent-2 | Do Y |
+
+   ---
+
+   ## Instructions
+
+   ### agent-1
+   START IMMEDIATELY.
+   1. Step 1
+   2. Step 2
+
+   ---
+
+   ## Output
+
+   Generate report.
+   ```
+
+2. **Test command**
+
+   ```bash
+   /<command-name> test-argument
+   ```
+
+---
+
+## Testing
+
+### Running Tests
 
 ```bash
-/run-tests --type all
-/run-tests --type unit
-/run-tests --type e2e
+# All tests
+npm test
+
+# Unit tests
+npm run test:unit
+
+# Integration tests
+npm run test:integration
+
+# E2E tests
+npm run test:e2e
+
+# Coverage report
+npm run test:coverage
 ```
 
----
+### Test Structure
 
-## Adding a New Agent
-
-### 1. Create Agent Definition
-
-Create `.agents/<agent-name>.yaml`:
-
-```yaml
-name: my-agent
-role: Agent Role Name
-description: |
-  Description of what the agent does.
-
-model:
-  primary: claude-sonnet-4-20250514
-  fallback: gpt-4o
-  temperature: 0.3
-
-execution_mode: autonomous_parallel
-startup_behavior: immediate
-
-capabilities:
-  - capability_1
-  - capability_2
-
-responsibilities:
-  - Responsibility 1
-  - Responsibility 2
-
-collaboration:
-  pattern: async_file_based
-  monitors:
-    - path/to/monitor/**
-  publishes_to:
-    - path/to/write/**
-  coordinates_with:
-    - other-agent
-
-permissions:
-  read: all
-  write:
-    - my/owned/directory/**
-  execute: false
-
-prompts:
-  system: |
-    You are an autonomous [Role] in a parallel multi-agent team.
-    
-    AUTONOMOUS OPERATION:
-    - Start immediately when the feature build begins
-    - Do NOT wait for other agents—work independently
-    ...
-
-tasks:
-  - task_1
-  - task_2
-
-file_ownership:
-  exclusive:
-    - my/owned/directory/**
-  shared_read:
-    - all
-
-status_reporting:
-  output_file: .agent-status/my-agent.json
-  update_frequency: on_change
+```
+tests/
+├── unit/
+│   ├── backend/           # Backend unit tests
+│   └── frontend/          # Frontend unit tests
+├── integration/           # Integration tests
+├── e2e/                   # End-to-end tests
+├── security/              # Security tests
+└── benchmarks/            # Performance benchmarks
 ```
 
-### 2. Update Orchestrator
+### Testing Standards
 
-Add the agent to `core/orchestrator/types.ts`:
-
-```typescript
-export type AgentName =
-  | 'product-manager'
-  | ...
-  | 'my-agent'  // Add here
-```
-
-Add write scopes to `core/services/teamLauncher.ts`:
-
-```typescript
-const AGENT_WRITE_SCOPES: Record<string, string[]> = {
-  ...
-  'my-agent': ['my/owned/directory/**'],
-};
-```
+- **Coverage target:** 80%+ for all code
+- **Unit tests:** Jest for both backend and frontend
+- **E2E tests:** Playwright for browser automation
+- **Test naming:** `describe('Component', () => { it('should...') })`
 
 ---
 
-## Adding a New Command
+## Best Practices
 
-### 1. Create Command File
+### For Agents
 
-Create `.claude/commands/<command-name>.md`:
+1. **Start Immediately** — Never wait for other agents
+2. **Stay In Lane** — Only write to owned directories
+3. **Coordinate via Files** — Monitor relevant repository files
+4. **Update Status** — Keep task state current
+5. **Document Work** — Add comments and documentation
 
-```markdown
-# Command Name
+### For Commands
 
-Description: **$ARGUMENTS**
+1. **Spawn All Agents** — Start agents simultaneously
+2. **Clear Task Definitions** — Specific acceptance criteria
+3. **Generate Reports** — Summarize results at completion
 
----
+### For Code
 
-## Agent Team
-
-Spawn these agents **simultaneously**:
-
-| # | Agent | Owns | Does |
-|---|-------|------|------|
-| 1 | **Agent 1** | `path/` | Does X |
-| 2 | **Agent 2** | `path/` | Does Y |
-
----
-
-## Execution Model
-
-All agents work **in parallel** with no dependencies.
-
----
-
-## Agent Instructions
-
-### Agent 1
-\`\`\`
-START IMMEDIATELY. Do NOT wait for other agents.
-
-1. Do task 1
-2. Do task 2
-\`\`\`
-
-### Agent 2
-\`\`\`
-START IMMEDIATELY. Do NOT wait for other agents.
-
-1. Do task A
-2. Do task B
-\`\`\`
-
----
-
-## Output
-
-Generate final report when complete.
-```
+1. **TypeScript** — Use strict mode
+2. **Testing** — Write tests for all code
+3. **Documentation** — JSDoc for public APIs
+4. **Consistency** — Follow knowledge/ guidelines
 
 ---
 
@@ -271,331 +495,45 @@ Generate final report when complete.
 
 ### Ownership Table
 
-| Agent | Writes To |
-|-------|-----------|
-| Product Manager | `docs/product.md`, `docs/user-stories/`, `docs/acceptance/` |
-| Architect | `docs/architecture.md`, `docs/adr/`, `docs/api-contracts/` |
-| Backend Engineer | `app/backend/`, `tests/unit/backend/`, `tests/integration/` |
-| Frontend Engineer | `app/frontend/`, `tests/unit/frontend/`, `tests/e2e/` |
+| Agent | Exclusive Write Access |
+|-------|------------------------|
+| Product Manager | `knowledge/product.md`, `docs/user-stories/` |
+| Architect | `docs/architecture.md`, `docs/adr/`, `knowledge/architecture.md` |
+| Backend Engineer | `services/backend/`, `tests/unit/backend/`, `tests/integration/` |
+| Frontend Engineer | `services/frontend/`, `tests/unit/frontend/`, `tests/e2e/` |
 | UI Designer | `ui/`, `docs/design/` |
 | DevOps Engineer | `platform/`, `.github/`, `docker-compose.yml` |
 | Security Engineer | `security/`, `docs/security/`, `tests/security/` |
 | QA Engineer | `tests/`, `docs/testing/` |
-| Performance Engineer | `tests/benchmarks/`, `docs/tests/benchmarks/` |
+| Performance Engineer | `tests/benchmarks/`, `performance/` |
 | Code Reviewer | `reviews/` |
-
----
-
-## Autonomous Parallel Execution
-
-### How It Works
-
-1. **Command Invoked** — User runs `/build-feature`
-2. **All Agents Spawn** — 10 agents start simultaneously
-3. **Independent Work** — Each agent works autonomously
-4. **File Coordination** — Agents read others' outputs for coordination
-5. **Status Updates** — Agents update `.agent-status/*.json`
-6. **Completion** — Final report generated when all complete
-
-### No Dependencies
-
-❌ **Wrong (Sequential):**
-```
-if architect is done:
-    start backend
-```
-
-✅ **Correct (Parallel):**
-```
-start all agents at t=0
-each agent checks for relevant files periodically
-```
-
-### File-Based Coordination
-
-Agents coordinate by reading repository files:
-
-```
-Product Manager writes docs/product.md
-    ↓
-All agents can read requirements
-    ↓
-Architect writes docs/architecture.md
-    ↓
-Backend/Frontend can read architecture
-```
-
----
-
-## Testing
-
-### Run Tests
-
-```bash
-# All tests
-npm test
-
-# Unit tests
-npm run test:unit
-
-# Integration tests
-npm run test:integration
-
-# E2E tests
-npm run test:e2e
-```
-
-### Test Coverage
-
-Target: 80%+ coverage
-
----
-
-## Debugging
-
-### Agent Status
-
-Check `.agent-status/<agent>.json` for agent state:
-
-```json
-{
-  "agent": "backend-engineer",
-  "status": "active",
-  "currentTask": "Implementing user service",
-  "progress": 0.75
-}
-```
-
-### Logs
-
-Agent logs are emitted during execution:
-
-```
-[backend-engineer] Implementing auth service...
-[frontend-engineer] Creating login component...
-```
-
----
-
-## Best Practices
-
-### For Agents
-
-1. **Start Immediately** — Never wait for other agents
-2. **Monitor Files** — Watch for relevant updates
-3. **Stay In Lane** — Only write to owned directories
-4. **Update Status** — Keep `.agent-status/` current
-5. **Document Work** — Write clear comments and docs
-
-### For Commands
-
-1. **Spawn All Agents** — Start everyone simultaneously
-2. **No Dependencies** — Don't create sequential phases
-3. **Clear Ownership** — Define who writes where
-4. **Generate Report** — Summarize at completion
-
-### For Code
-
-1. **TypeScript** — Use strict mode
-2. **Tests** — Write tests for all code
-3. **Documentation** — Document public APIs
-4. **Security** — Follow security best practices
-
----
-
-## References
-
-- [Architecture](architecture.md)
-- [Workflow](workflow.md)
-- [Agent Definitions](../.agents/)
-  - dependent_agent
-```
-
-### 2. Add Agent Configuration
-
-Update `configs/agents.yaml`:
-
-```yaml
-agents:
-  my-agent:
-    model: claude-sonnet-4-20250514
-    temperature: 0.3
-```
-
-### 3. Create Agent Prompt (Optional)
-
-Create `core/agents/implementations/<agent-name>/prompts.md`:
-
-```markdown
-# Agent Name Prompts
-
-## System Prompt
-You are a specialized agent...
-
-## Task Templates
-### Task 1
-Instructions for task 1...
-```
-
----
-
-## Adding a New Command
-
-### 1. Create Command File
-
-Create `.claude/commands/<command-name>.md`:
-
-```markdown
-# /<command-name>
-
-Description of what the command does.
-
-## Arguments
-- `<arg1>`: Description
-- `[--option]`: Optional flag
-
-## Execution
-
-1. Step 1
-2. Step 2
-3. Step 3
-
-## Example
-
-\`\`\`
-/<command-name> argument --option
-\`\`\`
-```
-
-### 2. Document the Command
-
-Add to `docs/workflow.md` if it creates a new workflow.
-
----
-
-## Adding a New Team
-
-### 1. Create Team Template
-
-Create `core/agents/teams/<team-name>_team.md`:
-
-```markdown
-# Team Name
-
-## Purpose
-What this team accomplishes.
-
-## Team Members
-- **agent_1**: Role and responsibility
-- **agent_2**: Role and responsibility
-
-## Execution Flow
-\`\`\`
-agent_1 → agent_2 → output
-\`\`\`
-
-## File Ownership
-- agent_1: `directory_a/`
-- agent_2: `directory_b/`
-
-## Spawn Prompt
-Instructions for spawning this team...
-```
-
-### 2. Create Associated Command
-
-Add command in `.claude/commands/` to invoke the team.
-
----
-
-## Working with the Knowledge Base
-
-### Knowledge Structure
-
-```
-docs/knowledge/
-├── architecture.md      # Architecture decisions
-├── coding_standards.md  # Project standards
-├── lessons_learned.md   # Lessons from past work
-└── project_context.md   # Project overview
-```
-
-### Updating Knowledge
-
-Agents with write access to `docs/knowledge/` can update these files:
-- **Architect** — architecture decisions
-- **Documentation** — general knowledge
-
-### Using Knowledge
-
-All agents can read from `docs/knowledge/` to inform their work.
-
----
-
-## Configuration Files
-
-### `configs/agents.yaml`
-Agent model settings and team configurations.
-
-### `configs/model_config.yaml`
-LLM provider settings and fallback chains.
-
-### `configs/environment.yaml`
-Environment-specific settings.
-
-### `.claude/settings.json`
-Claude Code settings including Agent Teams configuration.
-
----
-
-## Best Practices
-
-### Agent Design
-- **Single Responsibility** — each agent has one clear purpose
-- **Clear Ownership** — no overlapping file permissions
-- **Explicit Collaboration** — define how agents interact
-
-### Workflow Design
-- **Parallel Where Possible** — independent tasks run together
-- **Sequential Handoffs** — clear input/output contracts
-- **Adversarial Review** — use competition for quality
-
-### Documentation
-- **Keep Docs Updated** — documentation agent maintains docs
-- **Document Decisions** — use ADRs for architecture choices
-- **Capture Learnings** — update lessons_learned.md
 
 ---
 
 ## Troubleshooting
 
-### Agent Teams Not Working
-1. Check `.claude/settings.json` has `agentTeams: true`
-2. Verify `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set
-3. Ensure Claude Code is up to date
+### Agent Not Working
 
-### Agent Not Finding Files
-1. Verify file paths in agent permissions
-2. Check workspace is correctly opened
-3. Ensure files exist at expected locations
+1. Check agent definition in `.agents/`
+2. Verify task is properly assigned
+3. Check `core/state/agents.json` for status
 
-### Command Not Recognized
-1. Check command file exists in `.claude/commands/`
-2. Verify markdown format is correct
-3. Restart Claude Code if needed
+### Task Stuck
+
+1. Check `core/tasks/in-progress.md`
+2. Verify assigned agent is active
+3. Check for blocking dependencies
+
+### Command Failed
+
+1. Verify command file syntax
+2. Check all required agents exist
+3. Review error logs
 
 ---
 
-## Contributing
+## See Also
 
-1. **Fork** the repository
-2. **Create** a feature branch
-3. **Make** changes following the patterns above
-4. **Test** with Claude Code
-5. **Submit** a pull request
-
-### Contribution Areas
-- New agent definitions
-- New workflow patterns
-- Documentation improvements
-- Bug fixes
+- [Architecture Documentation](architecture.md) — System architecture
+- [Workflow Documentation](workflow.md) — Workflow phases
+- [Product Documentation](product.md) — Product overview

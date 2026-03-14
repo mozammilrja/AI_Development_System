@@ -1,12 +1,44 @@
 # Workflow Documentation
 
-This document describes how agents collaborate in the AI Development System.
+This document describes the workflow phases, task management, and agent collaboration patterns in the AI Development System.
 
 ---
 
-## Autonomous Parallel Execution Model
+## Table of Contents
 
-The AI Development System uses **fully autonomous parallel execution** where all 10 agents start simultaneously and work independently without waiting for each other.
+1. [Execution Model](#execution-model)
+2. [Workflow Phases](#workflow-phases)
+3. [Task Management](#task-management)
+4. [Agent Workflows](#agent-workflows)
+5. [Commands Reference](#commands-reference)
+6. [File-Based Coordination](#file-based-coordination)
+
+---
+
+## Execution Model
+
+### Autonomous Parallel Execution
+
+The AI Development System uses **fully autonomous parallel execution** where all 10 agents start simultaneously and work independently.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                       t=0 : ALL AGENTS START                              │
+├──────────┬──────────┬──────────┬──────────┬──────────┬───────────────────┤
+│ Product  │ Architect│ Backend  │ Frontend │    UI    │     DevOps        │
+│ Manager  │          │ Engineer │ Engineer │ Designer │    Engineer       │
+├──────────┼──────────┼──────────┼──────────┼──────────┼───────────────────┤
+│ Security │    QA    │ Perform- │   Code   │          │                   │
+│ Engineer │ Engineer │ ance Eng │ Reviewer │          │                   │
+└──────────┴──────────┴──────────┴──────────┴──────────┴───────────────────┘
+                                   │
+                   [All working independently in parallel]
+                                   │
+                                   ▼
+                         ┌─────────────────┐
+                         │  FINAL REPORT   │
+                         └─────────────────┘
+```
 
 ### Key Principles
 
@@ -18,103 +50,238 @@ The AI Development System uses **fully autonomous parallel execution** where all
 
 ---
 
-## The 10-Agent Team
+## Workflow Phases
 
-| Agent | Role | Writes To |
-|-------|------|-----------|
-| **Product Manager** | Requirements, user stories | `docs/product.md`, `docs/user-stories/` |
-| **Architect** | System design, APIs | `docs/architecture.md`, `docs/api-contracts/` |
-| **Backend Engineer** | APIs, services, database | `app/backend/` |
-| **Frontend Engineer** | React components, pages | `app/frontend/` |
-| **UI Designer** | Component specs, design tokens | `ui/` |
-| **DevOps Engineer** | CI/CD, infrastructure | `platform/`, `.github/` |
-| **Security Engineer** | Security audits, policies | `security/` |
-| **QA Engineer** | Tests | `tests/` |
-| **Performance Engineer** | Benchmarks, load tests | `tests/benchmarks/` |
-| **Code Reviewer** | Code review reports | `reviews/` |
+While agents work in parallel, their activities can be logically grouped into phases:
+
+### Phase 1: Foundation (Parallel)
+
+| Agent | Activity | Output |
+|-------|----------|--------|
+| **Product Manager** | Requirements gathering | `knowledge/product.md` |
+| **Architect** | System design | `docs/architecture.md` |
+| **UI Designer** | Design specifications | `ui/components/`, `ui/tokens/` |
+
+### Phase 2: Implementation (Parallel)
+
+| Agent | Activity | Output |
+|-------|----------|--------|
+| **Backend Engineer** | API implementation | `services/backend/` |
+| **Frontend Engineer** | UI implementation | `services/frontend/` |
+| **DevOps Engineer** | Infrastructure setup | `platform/` |
+
+### Phase 3: Quality Assurance (Parallel)
+
+| Agent | Activity | Output |
+|-------|----------|--------|
+| **QA Engineer** | Test writing | `tests/` |
+| **Security Engineer** | Security audit | `security/` |
+| **Performance Engineer** | Performance testing | `tests/benchmarks/` |
+
+### Phase 4: Review & Finalization
+
+| Agent | Activity | Output |
+|-------|----------|--------|
+| **Code Reviewer** | Final review | `reviews/` |
+
+### Phase Diagram
+
+```
+            ┌───────────────────────────────────────────────────────────────┐
+            │                    FEATURE BUILD WORKFLOW                      │
+            └───────────────────────────────────────────────────────────────┘
+                                         │
+          ┌──────────────────────────────┼──────────────────────────────┐
+          │                              │                              │
+          ▼                              ▼                              ▼
+┌──────────────────┐          ┌──────────────────┐          ┌──────────────────┐
+│     PRODUCT      │          │    ARCHITECT     │          │   UI DESIGNER    │
+│     MANAGER      │          │                  │          │                  │
+│                  │          │  System Design   │          │  Design Specs    │
+│  Requirements    │          │  API Contracts   │          │  Components      │
+└────────┬─────────┘          └────────┬─────────┘          └────────┬─────────┘
+         │                             │                              │
+         └─────────────────────────────┼──────────────────────────────┘
+                                       │
+    ┌──────────────────────────────────┼──────────────────────────────────┐
+    │                                  │                                  │
+    ▼                                  ▼                                  ▼
+┌──────────────────┐          ┌──────────────────┐          ┌──────────────────┐
+│     BACKEND      │          │     FRONTEND     │          │      DEVOPS      │
+│    ENGINEER      │          │    ENGINEER      │          │    ENGINEER      │
+│                  │          │                  │          │                  │
+│   APIs, DB       │          │  Components      │          │  CI/CD, Infra    │
+└────────┬─────────┘          └────────┬─────────┘          └────────┬─────────┘
+         │                             │                              │
+         └─────────────────────────────┼──────────────────────────────┘
+                                       │
+    ┌──────────────────────────────────┼──────────────────────────────────┐
+    │                                  │                                  │
+    ▼                                  ▼                                  ▼
+┌──────────────────┐          ┌──────────────────┐          ┌──────────────────┐
+│   QA ENGINEER    │          │     SECURITY     │          │   PERFORMANCE    │
+│                  │          │    ENGINEER      │          │    ENGINEER      │
+│   Tests          │          │   Audits         │          │   Benchmarks     │
+└────────┬─────────┘          └────────┬─────────┘          └────────┬─────────┘
+         │                             │                              │
+         └─────────────────────────────┼──────────────────────────────┘
+                                       │
+                                       ▼
+                          ┌──────────────────────┐
+                          │    CODE REVIEWER     │
+                          │                      │
+                          │    Final Review      │
+                          └──────────────────────┘
+                                       │
+                                       ▼
+                          ┌──────────────────────┐
+                          │    FINAL REPORT      │
+                          └──────────────────────┘
+```
 
 ---
 
-## 1. Feature Development Workflow
+## Task Management
 
-### Execution
+### Task Board Structure
 
-All 10 agents start **simultaneously** when `/build-feature` is invoked:
+Tasks are managed through a Kanban-style board in `core/tasks/`:
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                    t=0 : ALL AGENTS START                          │
-├──────────┬──────────┬──────────┬──────────┬──────────┬──────────┤
-│ Product  │ Architect│ Backend  │ Frontend │ UI       │ DevOps   │
-│ Manager  │          │ Engineer │ Engineer │ Designer │ Engineer │
-├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤
-│ Security │ QA       │ Perform- │ Code     │          │          │
-│ Engineer │ Engineer │ ance Eng │ Reviewer │          │          │
-└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
-                              │
-              [All working independently in parallel]
-                              │
-                              ▼
-                    ┌─────────────────┐
-                    │  FINAL REPORT   │
-                    └─────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           TASK BOARD                                     │
+├─────────────────────┬─────────────────────┬─────────────────────────────┤
+│       BACKLOG       │     IN-PROGRESS     │         COMPLETED           │
+│   (backlog.md)      │  (in-progress.md)   │      (completed.md)         │
+├─────────────────────┼─────────────────────┼─────────────────────────────┤
+│ □ TASK-001          │ ◐ TASK-002          │ ✓ TASK-000                  │
+│   Design API        │   Implement auth    │   Project setup             │
+│   [architect]       │   [backend-eng]     │   [devops-eng]              │
+│                     │                     │                             │
+│ □ TASK-003          │ ◐ TASK-004          │ ✓ TASK-005                  │
+│   Create UI specs   │   Write tests       │   Requirements done         │
+│   [ui-designer]     │   [qa-engineer]     │   [product-mgr]             │
+└─────────────────────┴─────────────────────┴─────────────────────────────┘
 ```
 
-### Command
+### Task Lifecycle
 
-```bash
-/build-feature user-authentication
+```
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│   CREATED   │ ──────► │   CLAIMED   │ ──────► │  COMPLETED  │
+│             │         │             │         │             │
+│ backlog.md  │         │in-progress  │         │completed.md │
+└─────────────┘         └─────────────┘         └─────────────┘
+       │                       │                       │
+       │                       │                       │
+  Agent finds            Agent moves            Agent moves
+  task in backlog       to in-progress         to completed
 ```
 
-### Agent Activities (All Simultaneous)
+### Task Format
 
-| Agent | Activity |
-|-------|----------|
-| Product Manager | Write requirements to `docs/product.md` |
-| Architect | Design architecture, write to `docs/architecture.md` |
-| Backend Engineer | Implement APIs in `app/backend/` |
-| Frontend Engineer | Build UI in `app/frontend/` |
-| UI Designer | Create designs in `ui/` |
-| DevOps Engineer | Configure CI/CD in `platform/` |
-| Security Engineer | Audit code, write to `security/` |
-| QA Engineer | Write tests in `tests/` |
-| Performance Engineer | Create benchmarks in `tests/benchmarks/` |
-| Code Reviewer | Review code, write to `reviews/` |
+Each task in the markdown files follows this format:
 
-### Example Output
+```markdown
+## TASK-XXX: Task Title
+
+- **Feature:** FEAT-XXX
+- **Agent:** agent-name
+- **Priority:** high | medium | low
+- **Status:** pending | in-progress | completed
+- **Created:** 2026-03-14T10:00:00Z
+
+### Description
+Detailed description of the task.
+
+### Acceptance Criteria
+- [ ] Criterion 1
+- [ ] Criterion 2
+
+### Dependencies
+- TASK-YYY (if any)
+```
+
+### State Synchronization
+
+Task state is also tracked in `core/state/tasks.json`:
+
+```json
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-14T12:00:00Z",
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "featureId": "FEAT-001",
+      "title": "Design authentication API",
+      "assignedTo": "architect",
+      "status": "completed",
+      "priority": "high",
+      "createdAt": "2026-03-14T10:00:00Z",
+      "completedAt": "2026-03-14T11:30:00Z"
+    }
+  ]
+}
+```
+
+---
+
+## Agent Workflows
+
+### 1. Feature Development Workflow
+
+**Command:** `/build-feature <feature-name>`
+
+All 10 agents start simultaneously:
+
+| Agent | Phase | Actions |
+|-------|-------|---------|
+| Product Manager | Foundation | Write requirements, user stories |
+| Architect | Foundation | Design architecture, API contracts |
+| UI Designer | Foundation | Create component specs, design tokens |
+| Backend Engineer | Implementation | Implement APIs, services, database |
+| Frontend Engineer | Implementation | Build React components, pages |
+| DevOps Engineer | Implementation | Configure CI/CD, infrastructure |
+| QA Engineer | Quality | Write unit, integration, E2E tests |
+| Security Engineer | Quality | Perform security audit, OWASP checks |
+| Performance Engineer | Quality | Create benchmarks, profile performance |
+| Code Reviewer | Review | Final code quality review |
+
+**Output Example:**
 
 ```
 [t=0] All 10 agents started
 
-[product-manager]     Writing requirements...
-[architect]           Designing system architecture...
-[backend-engineer]    Implementing auth service...
-[frontend-engineer]   Creating login components...
-[ui-designer]         Creating design specs...
-[devops-engineer]     Setting up CI pipeline...
-[security-engineer]   Auditing authentication code...
-[qa-engineer]         Writing auth tests...
-[performance-engineer] Creating auth benchmarks...
-[code-reviewer]       Reviewing all changes...
+[product-manager]     Writing requirements to knowledge/product.md
+[architect]           Designing architecture in docs/architecture.md
+[ui-designer]         Creating component specs in ui/
+[backend-engineer]    Implementing services in services/backend/
+[frontend-engineer]   Building components in services/frontend/
+[devops-engineer]     Configuring pipeline in platform/
+[qa-engineer]         Writing tests in tests/
+[security-engineer]   Auditing code in security/
+[performance-eng]     Creating benchmarks in tests/benchmarks/
+[code-reviewer]       Reviewing changes in reviews/
 
 [t=end] All agents completed
 
 == FINAL REPORT ==
-Product: 5 user stories defined
-Architecture: System designed, 2 ADRs created
-Backend: 8 files, 450 lines
-Frontend: 12 files, 6 components
-UI: 4 component specs, design tokens
-DevOps: CI pipeline configured
-Security: 0 critical, 1 medium issue
-QA: 42 tests written, 100% passing
-Performance: API < 50ms
-Review: APPROVED with suggestions
+Product:     5 user stories defined
+Architecture: System designed, 2 API contracts
+Backend:     8 files, 450 lines, 4 endpoints
+Frontend:    12 files, 6 components
+UI:          4 component specs, design tokens
+DevOps:      CI pipeline configured
+Security:    0 critical, 1 medium issue
+QA:          42 tests written, 100% passing
+Performance: API < 50ms p95
+Review:      APPROVED with suggestions
 ```
 
----
+### 2. Code Review Workflow
 
-## 2. Code Review Workflow
+**Command:** `/code-review`
 
 Multi-perspective parallel review:
 
@@ -134,24 +301,16 @@ Multi-perspective parallel review:
                          └─────────────────┘
 ```
 
-### Command
+### 3. Deployment Workflow
 
-```bash
-/code-review
-```
-
----
-
-## 3. Deployment Workflow
-
-Parallel preparation followed by deployment:
+**Command:** `/deploy-app --env <staging|production>`
 
 ```
 ┌─────────────────────────────────────────┐
 │        PHASE 1: Preparation (Parallel)  │
 ├──────────────┬──────────────┬───────────┤
 │    DevOps    │      QA      │  Security │
-│    Build     │   Prepare    │   Audit   │
+│   Build      │   Prepare    │   Audit   │
 └──────────────┴──────────────┴───────────┘
                      │
                      ▼
@@ -173,392 +332,207 @@ Parallel preparation followed by deployment:
            SUCCESS       ROLLBACK
 ```
 
-### Command
+### 4. Bug Fix Workflow
+
+**Command:** `/fix-bug <description>`
+
+```
+┌─────────────────────────────────────────┐
+│       DIAGNOSIS (Parallel)              │
+├──────────────┬──────────────────────────┤
+│   Backend    │        Frontend          │
+│  Investigate │       Investigate        │
+└──────────────┴──────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│       FIX IMPLEMENTATION                │
+│    Backend or Frontend Engineer         │
+└─────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│       VERIFICATION                      │
+├──────────────┬──────────────────────────┤
+│      QA      │       Security           │
+│   Test Fix   │       Verify Fix         │
+└──────────────┴──────────────────────────┘
+```
+
+---
+
+## Commands Reference
+
+### `/build-feature <name>`
+
+Build a complete feature with all 10 agents.
+
+```bash
+/build-feature user-authentication
+/build-feature shopping-cart with payment integration
+```
+
+**Creates tasks for:**
+- Product Manager: Define requirements
+- Architect: Design system
+- UI Designer: Create specs
+- Backend Engineer: Implement APIs
+- Frontend Engineer: Build UI
+- DevOps Engineer: Configure CI/CD
+- QA Engineer: Write tests
+- Security Engineer: Audit code
+- Performance Engineer: Benchmark
+- Code Reviewer: Final review
+
+### `/code-review`
+
+Run multi-perspective parallel code review.
+
+```bash
+/code-review
+```
+
+**Checks:**
+- Security vulnerabilities
+- Code quality standards
+- Performance implications
+- Test coverage
+
+### `/deploy-app --env <environment>`
+
+Deploy application to specified environment.
 
 ```bash
 /deploy-app --env staging
+/deploy-app --env production
 ```
+
+**Stages:**
+1. Build and package
+2. Run pre-deployment tests
+3. Deploy to environment
+4. Run smoke tests
+5. Validate deployment
+
+### `/fix-bug <description>`
+
+Debug and fix a reported issue.
+
+```bash
+/fix-bug "Login fails with special characters"
+/fix-bug "Cart total incorrect with discounts"
+```
+
+### `/write-tests`
+
+Generate comprehensive test suite.
+
+```bash
+/write-tests
+/write-tests --focus unit
+/write-tests --focus e2e
+```
+
+### `/security-audit`
+
+Run security vulnerability scan.
+
+```bash
+/security-audit
+```
+
+**Checks:**
+- OWASP Top 10
+- Dependency vulnerabilities
+- Authentication/Authorization
+- Data exposure risks
+
+### `/optimize-performance`
+
+Analyze and optimize performance.
+
+```bash
+/optimize-performance
+```
+
+**Analyzes:**
+- API response times
+- Database queries
+- Frontend bundle size
+- Memory usage
 
 ---
 
 ## File-Based Coordination
 
+### How Agents Coordinate
+
 Agents coordinate by reading and writing repository files:
 
-### Product Manager → All Agents
 ```
-writes: docs/product.md
-reads:  (feature request)
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          FILE-BASED COORDINATION                          │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                           │
+│  Product Manager                                                          │
+│       │                                                                   │
+│       └──writes──► knowledge/product.md                                   │
+│                          │                                                │
+│                    ◄─reads─┘                                              │
+│                          │                                                │
+│  Architect ──────────────┼──writes──► docs/architecture.md                │
+│                          │                                                │
+│                    ◄─reads─┘                                              │
+│                          │                                                │
+│  ┌───────────────────────┼───────────────────────┐                        │
+│  │ Backend Engineer      │      Frontend Engineer │                       │
+│  │      │                │             │          │                       │
+│  │      └──writes──► services/backend/ │          │                       │
+│  │                       │             │          │                       │
+│  │                       │  services/frontend/ ◄──┘                       │
+│  └───────────────────────┼───────────────────────┘                        │
+│                          │                                                │
+│                    ◄─reads─┘                                              │
+│                          │                                                │
+│  QA Engineer ────────────┼──writes──► tests/                              │
+│                          │                                                │
+│  Security Engineer ──────┼──writes──► security/                           │
+│                          │                                                │
+│  Performance Engineer ───┼──writes──► tests/benchmarks/                   │
+│                          │                                                │
+│                    ◄─reads─┘                                              │
+│                          │                                                │
+│  Code Reviewer ──────────┴──writes──► reviews/                            │
+│                                                                           │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Architect → Backend/Frontend
-```
-writes: docs/architecture.md, docs/api-contracts/
-reads:  docs/product.md
-```
+### Ownership Rules
 
-### Backend/Frontend → QA/Security/Performance
-```
-writes: app/backend/, app/frontend/
-reads:  docs/architecture.md, docs/api-contracts/, ui/
-```
+1. **Exclusive Writes** — Agents ONLY write to their owned directories
+2. **Universal Reads** — All agents can READ any file
+3. **No Overlap** — Directory ownership does not overlap
+4. **Code Reviewer is Read-Only** — Only writes to `reviews/`
 
-### QA/Security/Performance → Code Reviewer
-```
-writes: tests/, security/, tests/benchmarks/
-reads:  services/
-```
+### Ownership Table
 
-### Code Reviewer → Final Report
-```
-writes: reviews/
-reads:  (all)
-```
+| Agent | Exclusive Write Access |
+|-------|------------------------|
+| Product Manager | `knowledge/product.md`, `docs/user-stories/`, `docs/acceptance/` |
+| Architect | `docs/architecture.md`, `docs/adr/`, `knowledge/architecture.md` |
+| Backend Engineer | `services/backend/`, `tests/unit/backend/`, `tests/integration/` |
+| Frontend Engineer | `services/frontend/`, `tests/unit/frontend/`, `tests/e2e/` |
+| UI Designer | `ui/`, `docs/design/` |
+| DevOps Engineer | `platform/`, `.github/`, `docker-compose.yml` |
+| Security Engineer | `security/`, `docs/security/`, `tests/security/` |
+| QA Engineer | `tests/`, `docs/testing/` |
+| Performance Engineer | `tests/benchmarks/`, `performance/` |
+| Code Reviewer | `reviews/` |
 
 ---
 
-## Status Tracking
-
-Each agent updates `.agent-status/<agent>.json`:
-
-```json
-{
-  "agent": "backend-engineer",
-  "status": "active",
-  "currentTask": "Implementing user service",
-  "progress": 0.75,
-  "filesChanged": ["app/backend/src/user.ts"],
-  "lastUpdate": "2025-03-14T12:00:00Z"
-}
-```
-
----
-
-## Ownership Rules
-
-### Strict Enforcement
-- Agents ONLY write to their owned directories
-- Agents can READ any file
-- Code Reviewer is READ-ONLY (writes only to `reviews/`)
-
-### Conflict Prevention
-- No directory overlap between agents
-- Clear boundaries prevent write conflicts
-- Agents monitor others' output for coordination
-
----
-
-## Previous vs Current Model
-
-### Previous (Sequential)
-
-```
-Phase 1: Architect designs
-Phase 2: Backend + Frontend implement
-Phase 3: Tester writes tests
-Phase 4: Reviewer audits
-
-Total time: Sum of all phases
-```
-
-### Current (Parallel)
-
-```
-t=0: All 10 agents start
-t=end: All agents complete
-
-Total time: Max(agent completion times)
-```
-
-**Benefit:** Significantly faster feature development through parallelization.
-                     │  Synthesis  │  → Best solution
-                     └─────────────┘
-```
-
-### Command
-
-```
-/debug-bug <description>
-```
-
-### How It Works
-
-1. Three investigators analyze the bug in parallel
-2. Each proposes a hypothesis and evidence
-3. Investigators challenge each other's theories
-4. Lead debugger synthesizes the best fix
-5. Fix is validated and applied
-
-### Example
-
-```
-/debug-bug "Login fails with 500 error on special characters"
-
-[debugger-a]  Hypothesis: SQL injection escape issue
-[debugger-b]  Hypothesis: Password encoding problem
-[debugger-c]  Hypothesis: Database constraint violation
-[debugger-a]  ✓ Evidence: Stack trace shows escape function
-[debugger-a]  Confirmed root cause: improper escaping
-[debugger]    Fix applied: use parameterized queries
-```
-
----
-
-## 3. Code Review Workflow
-
-Multi-lens code review in parallel.
-
-### Team Structure
-
-```
-         ┌─────────────────┐
-         │ Security Review │  → Check vulnerabilities
-         ├─────────────────┤
-         │ Quality Review  │  → Check code quality
-         ├─────────────────┤
-         │ Coverage Review │  → Check test coverage
-         └────────┬────────┘
-                  │
-           ┌──────┴──────┐
-           │   Summary   │  → Consolidated report
-           └─────────────┘
-```
-
-### Command
-
-```
-/code-review [--focus security|quality|all]
-```
-
-### Review Categories
-
-| Lens | Checks |
-|------|--------|
-| **Security** | Vulnerabilities, auth issues, data exposure |
-| **Quality** | Code style, maintainability, complexity |
-| **Coverage** | Test coverage, edge cases, error handling |
-
-### Example
-
-```
-/code-review
-
-== Security Review ==
-✓ No SQL injection vulnerabilities
-⚠ Warning: API rate limiting not implemented
-
-== Quality Review ==
-✓ Code follows style guidelines
-⚠ Suggestion: Extract validation logic
-
-== Coverage Review ==
-Coverage: 87% (target: 80%)
-✓ All critical paths tested
-
-RESULT: APPROVED with 2 suggestions
-```
-
----
-
-## 4. Release Deployment Workflow
-
-Deployment with validation and rollback support.
-
-### Team Structure
-
-```
-┌──────────┐    ┌───────────┐    ┌──────────┐
-│  DevOps  │ →  │    QA     │ →  │  Deploy  │
-│ (Build)  │    │ (Validate)│    │ (Ship)   │
-└──────────┘    └───────────┘    └────┬─────┘
-                                      │
-                               ┌──────┴──────┐
-                               │ Health Check│
-                               └──────┬──────┘
-                                      │
-                        ┌─────────────┴─────────────┐
-                        ▼                           ▼
-                   ┌─────────┐                ┌──────────┐
-                   │ Success │                │ Rollback │
-                   └─────────┘                └──────────┘
-```
-
-### Command
-
-```
-/deploy-app --env staging|production
-```
-
-### Deployment Stages
-
-1. **Build** — DevOps builds and packages application
-2. **Validate** — QA runs smoke tests
-3. **Deploy** — Ship to target environment
-4. **Health Check** — Verify deployment success
-5. **Rollback** — Automatic on failure
-
-### Example
-
-```
-/deploy-app --env staging
-
-[devops]    Building application...
-[devops]    ✓ Build complete: v1.2.0
-[qa]        Running smoke tests...
-[qa]        ✓ 12/12 tests passed
-[devops]    Deploying to staging...
-[devops]    ✓ Deployment complete
-[devops]    Running health checks...
-[devops]    ✓ All services healthy
-
-Deployment successful: https://staging.example.com
-```
-
----
-
-## 5. Research & Evaluation Workflow
-
-Technology evaluation using adversarial analysis.
-
-### Team Structure
-
-```
-┌─────────────┐
-│  Proponent  │  → Argues FOR the technology
-├─────────────┤
-│   Critic    │  → Argues AGAINST
-├─────────────┤
-│  Evaluator  │  → Neutral synthesis
-└──────┬──────┘
-       │
-  ┌────┴────┐
-  │ Report  │  → Final recommendation
-  └─────────┘
-```
-
-### Command
-
-```
-/research-tech <topic>
-```
-
-### Example
-
-```
-/research-tech "GraphQL vs REST for mobile API"
-
-[proponent]   GraphQL advantages: single endpoint, exact data...
-[critic]      GraphQL concerns: caching, complexity, N+1...
-[evaluator]   Considering mobile use case...
-
-== Recommendation ==
-GraphQL is recommended for this use case because:
-- Reduced payload sizes benefit mobile
-- Single endpoint simplifies networking
-- Schema provides contract for mobile team
-
-Effort: ~2 weeks | Risk: Medium
-```
-
----
-
-## 6. Test Execution Workflow
-
-Run tests with parallel execution.
-
-### Command
-
-```
-/run-tests [--type unit|integration|e2e|all]
-```
-
-### Test Types
-
-| Type | Tool | Scope |
-|------|------|-------|
-| Unit | Jest | Individual functions |
-| Integration | Jest/Playwright | Component interactions |
-| E2E | Playwright | Full user flows |
-
-### Example
-
-```
-/run-tests --type all
-
-[tester]  Running unit tests... 45/45 passed
-[tester]  Running integration tests... 12/12 passed
-[tester]  Running E2E tests... 8/8 passed
-
-== Results ==
-Total: 65 tests | Passed: 65 | Failed: 0
-Coverage: 89%
-```
-
----
-
-## Creating Custom Workflows
-
-### 1. Define the Team Template
-
-Create a markdown file in `core/agents/teams/`:
-
-```markdown
-# Custom Team
-
-## Team Members
-- agent_1: Role description
-- agent_2: Role description
-
-## Execution Flow
-agent_1 → agent_2 → output
-
-## File Ownership
-- agent_1: directory_a/
-- agent_2: directory_b/
-```
-
-### 2. Create the Command
-
-Add a command file in `.claude/commands/`:
-
-```markdown
-# /custom-command
-
-Spawn a custom team to perform a task.
-
-## Arguments
-- `<arg>`: Description
-
-## Execution
-1. Launch agent_1 with context
-2. Hand off to agent_2
-3. Generate output
-```
-
-### 3. Document the Workflow
-
-Add documentation in `docs/workflow.md`.
-
----
-
-## Best Practices
-
-### Clear Task Definitions
-- Define acceptance criteria for each task
-- Include context and constraints
-- Specify expected outputs
-
-### Respect File Ownership
-- Each agent writes only to owned directories
-- Use handoffs for cross-boundary work
-- Reviewer remains read-only
-
-### Use Parallel Execution
-- Independent tasks run in parallel
-- Reduces total execution time
-- Better resource utilization
-
-### Enable Adversarial Review
-- Multiple perspectives catch more issues
-- Challenge assumptions explicitly
-- Synthesize the best solution
+## See Also
+
+- [Architecture Documentation](architecture.md) — System architecture details
+- [Developer Guide](developer_guide.md) — Setup and contribution guide
+- [Product Documentation](product.md) — Product overview and features

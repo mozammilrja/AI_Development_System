@@ -1,0 +1,13 @@
+{
+  "$schema": "./schemas/progress.schema.json",
+  "version": "1.0.0",
+  "lastUpdated": null,
+  "features": [],
+  "summary": {
+    "totalFeatures": 0,
+    "completed": 0,
+    "inProgress": 0,
+    "pending": 0,
+    "blocked": 0
+  }
+}

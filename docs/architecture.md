@@ -2,37 +2,84 @@
 
 ## System Overview
 
-The AI Development System is a **fully autonomous multi-agent software engineering platform** built on **Node.js, TypeScript, and MongoDB**. It automates software development workflows using a team of 10 specialized AI agents that work **in parallel** without sequential phases.
+The AI Development System is a **fully autonomous multi-agent software engineering platform** that automates the complete software development lifecycle. Built on **Node.js, TypeScript, and MongoDB**, it orchestrates 10 specialized AI agents working **in parallel** to design, implement, test, secure, and deploy software.
 
-All agents operate **autonomously and simultaneously**, coordinating through repository files rather than direct messaging. This enables truly parallel development where no agent waits for another.
+### Core Principles
+
+1. **Autonomous Execution** — Agents work independently without human intervention
+2. **Parallel Processing** — All agents start simultaneously, no sequential phases
+3. **File-Based Coordination** — Agents communicate through repository files, not messages
+4. **Exclusive Ownership** — Each agent has dedicated directories to prevent conflicts
+5. **Continuous Integration** — Changes flow through automated pipelines
 
 ---
 
-## Autonomous Multi-Agent Architecture
+## Multi-Agent Architecture
 
 ```
-┌────────────────────────────────────────────────────────────────────────────┐
-│                        AUTONOMOUS AGENT TEAM                                │
-│                     (10 Agents Running in Parallel)                        │
-├──────────────┬──────────────┬──────────────┬──────────────┬────────────────┤
-│   Product    │   Architect  │    UI        │   Backend    │   Frontend     │
-│   Manager    │              │   Designer   │   Engineer   │   Engineer     │
-│              │              │              │              │                │
-│ docs/product │ docs/arch    │ ui/          │ services/    │ services/      │
-│              │ docs/adr     │ docs/design  │ backend      │ frontend       │
-├──────────────┼──────────────┼──────────────┼──────────────┼────────────────┤
-│   DevOps     │   Security   │     QA       │ Performance  │    Code        │
-│   Engineer   │   Engineer   │   Engineer   │   Engineer   │   Reviewer     │
-│              │              │              │              │                │
-│ platform/    │ security/    │ tests/       │ tests/benchmarks/ │ reviews/       │
-│ .github/     │ docs/security│ docs/testing │ docs/perf    │ (read-only)    │
-└──────────────┴──────────────┴──────────────┴──────────────┴────────────────┘
-                                    │
-                        ┌───────────┴────────────┐
-                        │   Repository Files     │
-                        │   (Coordination Hub)   │
-                        └────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         AI DEVELOPMENT SYSTEM                                 │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                              INTERFACE LAYER                                  │
+│   Claude Code CLI / VS Code Extension → Slash Commands → Agent Invocation     │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                            ORCHESTRATION LAYER                                │
+│   ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐              │
+│   │  Workflow       │  │  Task           │  │  State          │              │
+│   │  Engine         │  │  Router         │  │  Manager        │              │
+│   └─────────────────┘  └─────────────────┘  └─────────────────┘              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                          AGENT LAYER (10 AGENTS)                              │
+│  ┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐         │
+│  │ Product  │ Architect│ Backend  │ Frontend │    UI    │  DevOps  │         │
+│  │ Manager  │          │ Engineer │ Engineer │ Designer │ Engineer │         │
+│  ├──────────┼──────────┼──────────┼──────────┴──────────┴──────────┤         │
+│  │ Security │    QA    │ Perform- │        Code Reviewer           │         │
+│  │ Engineer │ Engineer │ ance Eng │        (Read-Only Audit)       │         │
+│  └──────────┴──────────┴──────────┴────────────────────────────────┘         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                         COORDINATION LAYER                                    │
+│   core/state/tasks.json  │  core/tasks/*.md  │  .agent-status/*.json         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                          APPLICATION LAYER                                    │
+│      services/backend/  │  services/frontend/  │  ui/  │  platform/          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                             DATA LAYER                                        │
+│              MongoDB (DocumentDB)  │  Redis (ElastiCache)                     │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## The 10-Agent Team
+
+| # | Agent | Role | Primary Output |
+|---|-------|------|----------------|
+| 1 | **Product Manager** | Requirements, user stories, acceptance criteria | `knowledge/product.md` |
+| 2 | **Architect** | System design, API contracts, technical decisions | `docs/architecture.md` |
+| 3 | **Backend Engineer** | APIs, services, database models, business logic | `services/backend/` |
+| 4 | **Frontend Engineer** | React components, pages, client state | `services/frontend/` |
+| 5 | **UI Designer** | Design system, components, tokens | `ui/` |
+| 6 | **DevOps Engineer** | CI/CD, infrastructure, deployment | `platform/` |
+| 7 | **Security Engineer** | Security audits, policies, vulnerability fixes | `security/` |
+| 8 | **QA Engineer** | Unit, integration, E2E tests | `tests/` |
+| 9 | **Performance Engineer** | Benchmarks, profiling, optimization | `tests/benchmarks/` |
+| 10 | **Code Reviewer** | Code review, quality gates | `reviews/` (read-only) |
+
+### Agent Ownership Map
+
+| Agent | Exclusive Write Access |
+|-------|------------------------|
+| Product Manager | `knowledge/product.md`, `docs/user-stories/`, `docs/acceptance/` |
+| Architect | `docs/architecture.md`, `docs/adr/`, `knowledge/architecture.md` |
+| Backend Engineer | `services/backend/`, `tests/unit/backend/`, `tests/integration/` |
+| Frontend Engineer | `services/frontend/`, `tests/unit/frontend/`, `tests/e2e/` |
+| UI Designer | `ui/`, `docs/design/` |
+| DevOps Engineer | `platform/`, `.github/`, `docker-compose.yml` |
+| Security Engineer | `security/`, `docs/security/`, `tests/security/` |
+| QA Engineer | `tests/`, `docs/testing/` |
+| Performance Engineer | `tests/benchmarks/`, `performance/` |
+| Code Reviewer | `reviews/` (read-only audit of all code) |
 
 ---
 
@@ -40,27 +87,33 @@ All agents operate **autonomously and simultaneously**, coordinating through rep
 
 ### Autonomous Parallel Execution
 
-All 10 agents start **simultaneously** when a feature build begins:
+All 10 agents start **simultaneously** when a workflow begins:
 
-1. **No Sequential Phases** — Agents do not wait for each other
-2. **File-Based Coordination** — Agents monitor repository files
-3. **Exclusive Ownership** — Each agent writes only to their directories
-4. **Continuous Operation** — Agents work until completion
+```
+t=0  ──┬── Product Manager    ────────────────────► Complete
+       ├── Architect          ────────────────────► Complete
+       ├── Backend Engineer   ────────────────────► Complete
+       ├── Frontend Engineer  ────────────────────► Complete
+       ├── UI Designer        ────────────────────► Complete
+       ├── DevOps Engineer    ────────────────────► Complete
+       ├── Security Engineer  ────────────────────► Complete
+       ├── QA Engineer        ────────────────────► Complete
+       ├── Performance Eng.   ────────────────────► Complete
+       └── Code Reviewer      ────────────────────► Complete
+                                                        │
+                                                        ▼
+                                               ┌─────────────────┐
+                                               │  FINAL REPORT   │
+                                               └─────────────────┘
+```
 
-### Agent Ownership Map
+### Key Characteristics
 
-| Agent | Exclusive Write Access |
-|-------|------------------------|
-| Product Manager | `docs/product.md`, `docs/user-stories/`, `docs/acceptance/` |
-| Architect | `docs/architecture.md`, `docs/adr/`, `docs/api-contracts/` |
-| Backend Engineer | `app/backend/`, `tests/unit/backend/`, `tests/integration/` |
-| Frontend Engineer | `app/frontend/`, `tests/unit/frontend/`, `tests/e2e/` |
-| UI Designer | `ui/`, `docs/design/` |
-| DevOps Engineer | `platform/`, `.github/`, `docker-compose.yml` |
-| Security Engineer | `security/`, `docs/security/`, `tests/security/` |
-| QA Engineer | `tests/`, `docs/testing/` |
-| Performance Engineer | `tests/benchmarks/`, `docs/tests/benchmarks/` |
-| Code Reviewer | `reviews/` (read-only audit of all code) |
+1. **No Sequential Phases** — All agents begin at t=0
+2. **Independent Work** — Each agent operates autonomously
+3. **File-Based Coordination** — Agents read each other's output files
+4. **Exclusive Ownership** — No write conflicts between agents
+5. **Continuous Progress** — Agents monitor and adapt to changes
 
 ---
 
@@ -68,235 +121,311 @@ All 10 agents start **simultaneously** when a feature build begins:
 
 | Layer | Technology |
 |-------|------------|
-| Runtime | Node.js (ES2022) |
+| Runtime | Node.js 20 (ES2022) |
 | Language | TypeScript (strict mode) |
-| Database | MongoDB (Mongoose ODM) |
-| AI Agents | Claude Agent Teams (Claude Sonnet primary, GPT-4o fallback) |
+| Database | MongoDB / AWS DocumentDB |
+| Cache | Redis / AWS ElastiCache |
+| AI Models | Claude Sonnet (primary), GPT-4o (fallback) |
 | Frontend | React 18, Vite, Tailwind CSS |
 | Backend | Express.js, Zod validation |
-| Infrastructure | Docker Compose, Terraform (AWS) |
+| Testing | Jest (unit/integration), Playwright (E2E) |
+| Infrastructure | Docker, Kubernetes, Terraform (AWS) |
+| CI/CD | GitHub Actions |
 
 ---
 
 ## Directory Structure
 
 ```
-ai-development-system/
-├── CLAUDE.md                          # Master context for all agents
+AI_Development_System/
+├── CLAUDE.md                          # Master context for AI agents
 ├── README.md                          # Project overview
 ├── docker-compose.yml                 # Container orchestration
+├── package.json                       # Root dependencies
 │
-├── .agents/                           # Agent role definitions (YAML)
-│   ├── product-manager.yaml
-│   ├── architect.yaml
-│   ├── backend-engineer.yaml
-│   ├── frontend-engineer.yaml
-│   ├── ui-designer.yaml
-│   ├── devops-engineer.yaml
-│   ├── security-engineer.yaml
-│   ├── qa-engineer.yaml
-│   ├── performance-engineer.yaml
-│   └── code-reviewer.yaml
+├── .agents/                           # Agent role definitions
+│   ├── product-manager.agent.md
+│   ├── architect.agent.md
+│   ├── backend-engineer.agent.md
+│   ├── frontend-engineer.agent.md
+│   ├── ui-designer.agent.md
+│   ├── devops-engineer.agent.md
+│   ├── security-engineer.agent.md
+│   ├── qa-engineer.agent.md
+│   ├── performance-engineer.agent.md
+│   └── reviewer.agent.md
 │
 ├── .claude/                           # Claude Code configuration
-│   ├── commands/                      # Slash commands
-│   │   ├── build-feature.md           # 10-agent parallel feature build
-│   │   ├── code-review.md             # Multi-lens parallel review
+│   ├── commands/                      # Slash commands (workflows)
+│   │   ├── build-feature.md           # Multi-agent feature build
+│   │   ├── code-review.md             # Parallel code review
 │   │   ├── deploy-app.md              # Deployment workflow
-│   │   └── ...
-│   └── settings.json
+│   │   ├── fix-bug.md                 # Bug fix workflow
+│   │   ├── write-tests.md             # Test generation
+│   │   ├── security-audit.md          # Security audit
+│   │   └── optimize-performance.md    # Performance optimization
+│   └── settings.json                  # Claude settings
 │
-├── .agent-status/                     # Agent status files (JSON)
+├── core/                              # Orchestration engine
+│   ├── orchestration/                 # Workflow coordination
+│   │   ├── workflow-engine.md         # Engine documentation
+│   │   └── agent-protocol.md          # Agent communication protocol
+│   ├── state/                         # System state management
+│   │   ├── tasks.json                 # Current task assignments
+│   │   ├── agents.json                # Agent status registry
+│   │   ├── progress.json              # Workflow progress tracking
+│   │   └── schemas/                   # JSON schemas for validation
+│   ├── tasks/                         # Task board (Kanban)
+│   │   ├── backlog.md                 # Pending tasks
+│   │   ├── in-progress.md             # Active tasks
+│   │   └── completed.md               # Finished tasks
+│   ├── models/                        # Data models
+│   ├── services/                      # Core services
+│   └── workflows/                     # Workflow definitions
 │
-├── core/                              # Orchestration core (TypeScript)
-│   ├── orchestrator/
-│   │   ├── agentRunner.ts             # Agent execution engine
-│   │   └── types.ts                   # Shared type definitions
-│   ├── services/
-│   │   ├── teamLauncher.ts            # Autonomous parallel launcher
-│   │   └── taskRouter.ts              # Intent → workflow routing
-│   └── workflows/
-│       ├── autonomousWorkflow.ts      # 10-agent parallel workflow
-│       ├── developmentFlow.ts         # Feature development
-│       └── ...
+├── services/                          # Application services
+│   ├── backend/                       # Backend API (Backend Engineer)
+│   └── frontend/                      # Frontend app (Frontend Engineer)
 │
-├── services/                          # Application code
-│   ├── backend/                       # Backend (owned by Backend Engineer)
-│   └── frontend/                      # Frontend (owned by Frontend Engineer)
-│
-├── ui/                                # UI designs (owned by UI Designer)
+├── ui/                                # Design system (UI Designer)
 │   ├── components/                    # Component specifications
 │   ├── tokens/                        # Design tokens
 │   └── flows/                         # User flow diagrams
 │
-├── security/                          # Security (owned by Security Engineer)
-│   ├── configs/                       # Security configurations
-│   └── policies/                      # Security policies
+├── security/                          # Security (Security Engineer)
+│   ├── policies/                      # Security policies
+│   └── audits/                        # Audit reports
 │
-├── tests/benchmarks/                       # Performance (owned by Performance Engineer)
-│   ├── benchmarks/                    # Performance benchmarks
-│   └── load-tests/                    # Load testing configs
+├── tests/                             # Test suites (QA Engineer)
+│   ├── unit/                          # Unit tests
+│   ├── integration/                   # Integration tests
+│   ├── e2e/                           # End-to-end tests
+│   ├── security/                      # Security tests
+│   └── benchmarks/                    # Performance benchmarks
 │
-├── reviews/                           # Code reviews (owned by Code Reviewer)
+├── platform/                          # Infrastructure (DevOps Engineer)
+│   ├── docker/                        # Docker configurations
+│   ├── deployment/                    # Deployment configs
+│   │   ├── environments/              # Environment configs
+│   │   ├── pipelines/                 # CI/CD pipelines
+│   │   └── scripts/                   # Deploy/rollback scripts
+│   └── infrastructure/                # IaC (Terraform, K8s)
 │
-├── tests/                             # Tests (owned by QA Engineer)
-│   ├── unit/
-│   │   ├── backend/
-│   │   └── frontend/
-│   ├── integration/
-│   ├── e2e/
-│   └── security/
-│
-├── platform/                          # Infrastructure (owned by DevOps)
-│   ├── infrastructure/
-│   │   ├── docker/
-│   │   └── terraform/
-│   └── environments/
+├── knowledge/                         # Knowledge base
+│   ├── api-design-guidelines.md
+│   ├── coding-standards.md
+│   ├── architecture-patterns.md
+│   ├── testing-guidelines.md
+│   ├── security-best-practices.md
+│   └── performance-optimization.md
 │
 ├── docs/                              # Documentation
-│   ├── product.md                     # Product requirements (Product Manager)
-│   ├── architecture.md                # This file (Architect)
-│   ├── user-stories/                  # User stories (Product Manager)
-│   ├── acceptance/                    # Acceptance criteria (Product Manager)
-│   ├── api/                           # API documentation (Backend Engineer)
-│   ├── api-contracts/                 # API contracts (Architect)
-│   ├── design/                        # Design docs (UI Designer)
-│   ├── security/                      # Security docs (Security Engineer)
-│   ├── tests/benchmarks/                   # Performance docs (Performance Engineer)
-│   ├── testing/                       # Testing docs (QA Engineer)
-│   └── infrastructure/                # Infrastructure docs (DevOps)
+│   ├── architecture.md                # This file
+│   ├── workflow.md                    # Workflow documentation
+│   ├── developer_guide.md             # Developer guide
+│   └── product.md                     # Product documentation
 │
-└── docs/knowledge/                         # Knowledge base
-    ├── architecture.md
-    ├── coding_standards.md
-    └── lessons_learned.md
+└── reviews/                           # Code reviews (Reviewer)
 ```
 
 ---
 
-## High-Level Architecture
+## State Management System
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│  1. Interface Layer — Claude Code CLI / VS Code                   │
-│     Slash commands: /build-feature, /code-review, /deploy-app     │
-├──────────────────────────────────────────────────────────────────┤
-│  2. Orchestration Layer (Node.js / TypeScript)                    │
-│     core/orchestrator/agentRunner.ts — Parallel agent execution   │
-│     core/services/teamLauncher.ts    — Autonomous team launcher   │
-│     core/workflows/autonomousWorkflow.ts — 10-agent parallel      │
-├──────────────────────────────────────────────────────────────────┤
-│  3. Agent Layer (10 Autonomous Agents)                            │
-│     .agents/*.yaml — Agent definitions                            │
-│     All agents run in parallel                                    │
-│     File-based coordination via repository                        │
-├──────────────────────────────────────────────────────────────────┤
-│  4. Application Layer                                             │
-│     app/backend/   — Backend APIs and services               │
-│     app/frontend/  — React/Vite frontend                     │
-├──────────────────────────────────────────────────────────────────┤
-│  5. Data Layer (MongoDB via Mongoose)                             │
-│     core/models/Task.ts          — tasks collection               │
-│     core/models/AgentRun.ts      — agent_runs collection          │
-│     core/models/WorkflowState.ts — workflow_state collection      │
-└──────────────────────────────────────────────────────────────────┘
-```
+### Task State (`core/state/tasks.json`)
 
----
-
-## Agent Communication
-
-### File-Based Coordination
-
-Agents coordinate through repository files instead of direct messaging:
-
-```
-Product Manager writes → docs/product.md
-                         ↓
-        [All agents read requirements]
-                         ↓
-Architect writes      → docs/architecture.md, docs/api-contracts/
-                         ↓
-        [Backend/Frontend engineers read specs]
-                         ↓
-Backend writes        → app/backend/
-Frontend writes       → app/frontend/
-                         ↓
-        [QA/Security/Performance monitor code]
-                         ↓
-QA writes             → tests/
-Security writes       → security/, docs/security/
-Performance writes    → tests/benchmarks/
-                         ↓
-        [Code Reviewer audits all code]
-                         ↓
-Reviewer writes       → reviews/
-```
-
-### Status Tracking
-
-Each agent maintains a status file in `.agent-status/`:
+Tracks all task assignments and statuses:
 
 ```json
 {
-  "agent": "backend-engineer",
-  "status": "active",
-  "currentTask": "Implementing user authentication API",
-  "progress": 0.6,
-  "lastUpdate": "2025-03-14T12:00:00Z",
-  "filesChanged": ["app/backend/src/auth.ts"]
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-14T12:00:00Z",
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "featureId": "FEAT-001",
+      "title": "Design authentication architecture",
+      "assignedTo": "architect",
+      "status": "in-progress",
+      "priority": "high"
+    }
+  ]
+}
+```
+
+### Agent State (`core/state/agents.json`)
+
+Tracks agent availability and current work:
+
+```json
+{
+  "agents": {
+    "architect": {
+      "status": "active",
+      "currentTask": "TASK-001",
+      "lastHeartbeat": "2026-03-14T12:00:00Z"
+    }
+  }
+}
+```
+
+### Progress State (`core/state/progress.json`)
+
+Tracks feature build progress:
+
+```json
+{
+  "features": {
+    "FEAT-001": {
+      "name": "User Authentication",
+      "status": "in-progress",
+      "startedAt": "2026-03-14T10:00:00Z",
+      "phases": {
+        "architecture": "completed",
+        "implementation": "in-progress",
+        "testing": "pending"
+      }
+    }
+  }
 }
 ```
 
 ---
 
-## Workflow Patterns
+## Task Board (`core/tasks/`)
 
-### Autonomous Parallel (Default)
-
-All agents work simultaneously with no dependencies:
+Tasks flow through a Kanban-style board:
 
 ```
-t=0  ──┬── Product Manager
-       ├── Architect
-       ├── Backend Engineer
-       ├── Frontend Engineer
-       ├── UI Designer         ────► All working in parallel
-       ├── DevOps Engineer
-       ├── Security Engineer
-       ├── QA Engineer
-       ├── Performance Engineer
-       └── Code Reviewer
-            │
-            ▼
-t=end    Final Report
+┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
+│    BACKLOG      │ ───► │   IN-PROGRESS   │ ───► │   COMPLETED     │
+│  (backlog.md)   │      │(in-progress.md) │      │ (completed.md)  │
+└─────────────────┘      └─────────────────┘      └─────────────────┘
 ```
 
-### No Sequential Phases
+### Task Lifecycle
 
-❌ Old Model (Sequential):
+1. **Created** → Task added to `backlog.md`
+2. **Claimed** → Agent moves task to `in-progress.md`
+3. **Completed** → Agent moves task to `completed.md`
+
+---
+
+## Agent Communication Protocol
+
+### File-Based Coordination Flow
+
 ```
-Architect → Backend+Frontend → Tester → Reviewer
+Product Manager   ──writes──►  knowledge/product.md
+                                     │
+                              ◄──reads──
+                                     │
+Architect         ──writes──►  docs/architecture.md
+                                     │
+                              ◄──reads──
+                                     │
+┌────────────────────────────────────┴────────────────────────────────────┐
+│                                                                          │
+Backend Engineer  ──writes──►  services/backend/                           │
+Frontend Engineer ──writes──►  services/frontend/                          │
+UI Designer       ──writes──►  ui/                                         │
+DevOps Engineer   ──writes──►  platform/                                   │
+                                     │
+                              ◄──reads──
+                                     │
+QA Engineer       ──writes──►  tests/
+Security Engineer ──writes──►  security/
+Performance Eng.  ──writes──►  tests/benchmarks/
+                                     │
+                              ◄──reads──
+                                     │
+Code Reviewer     ──writes──►  reviews/
 ```
 
-✅ New Model (Parallel):
+### Coordination Rules
+
+1. **Exclusive Writes** — Agents only write to owned directories
+2. **Universal Reads** — All agents can read any file
+3. **No Direct Messaging** — Communication through files only
+4. **Atomic Updates** — Changes committed as complete units
+
+---
+
+## High-Level System Architecture
+
 ```
-All 10 agents start at t=0 and work independently
+┌────────────────────────────────────────────────────────────────────────────┐
+│  1. Interface Layer — Claude Code CLI / VS Code                            │
+│     Commands: /build-feature, /code-review, /deploy-app, /fix-bug          │
+├────────────────────────────────────────────────────────────────────────────┤
+│  2. Orchestration Layer (TypeScript)                                       │
+│     core/orchestration/  — Workflow engine and agent protocol              │
+│     core/state/          — Task assignments and progress tracking          │
+│     core/tasks/          — Kanban task board                               │
+├────────────────────────────────────────────────────────────────────────────┤
+│  3. Agent Layer (10 Autonomous Agents)                                     │
+│     .agents/*.agent.md   — Agent role definitions                          │
+│     Parallel execution, file-based coordination                            │
+├────────────────────────────────────────────────────────────────────────────┤
+│  4. Application Layer                                                      │
+│     services/backend/    — Express.js REST API                             │
+│     services/frontend/   — React 18 + Vite SPA                             │
+│     ui/                  — Design system and components                    │
+├────────────────────────────────────────────────────────────────────────────┤
+│  5. Infrastructure Layer                                                   │
+│     platform/docker/     — Container configurations                        │
+│     platform/deployment/ — CI/CD and environment configs                   │
+│     platform/infrastructure/ — Terraform and Kubernetes                    │
+├────────────────────────────────────────────────────────────────────────────┤
+│  6. Data Layer                                                             │
+│     MongoDB              — Primary database                                │
+│     Redis                — Caching and sessions                            │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Commands
+## Commands Reference
 
-```bash
-# Build a feature with 10 parallel agents
-/build-feature <feature-description>
+| Command | Description | Agents Involved |
+|---------|-------------|-----------------|
+| `/build-feature <name>` | Build complete feature | All 10 agents |
+| `/code-review` | Multi-perspective code review | Security, QA, Reviewer |
+| `/deploy-app --env <env>` | Deploy to environment | DevOps, QA, Security |
+| `/fix-bug <description>` | Debug and fix issue | Backend, Frontend, QA |
+| `/write-tests` | Generate test suite | QA, Backend, Frontend |
+| `/security-audit` | Security vulnerability scan | Security, Reviewer |
+| `/optimize-performance` | Performance optimization | Performance, Backend |
 
-# Multi-lens parallel code review
-/code-review
+---
 
-# Deploy to staging/production
-/deploy-app --env staging
+## Design Principles
+
+### 1. Autonomous Operation
+Agents work independently without requiring human approval for each step.
+
+### 2. Parallel Execution
+No sequential phases — all agents can contribute simultaneously.
+
+### 3. File-Based Communication
+Repository files serve as the single source of truth for coordination.
+
+### 4. Exclusive Ownership
+Clear directory boundaries prevent conflicts between agents.
+
+### 5. Knowledge-Driven
+Agents consult the `knowledge/` base for standards and patterns.
+
+### 6. Observable State
+All system state is visible through JSON files and task boards.
+
+---
+
+## See Also
+
+- [Workflow Documentation](workflow.md) — Detailed workflow phases
+- [Developer Guide](developer_guide.md) — Setup and contribution guide
+- [Product Documentation](product.md) — Product overview and features
 
 # Run all tests
 /run-tests --type all
