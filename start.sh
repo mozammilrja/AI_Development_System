@@ -1,47 +1,76 @@
 #!/bin/bash
-# Start the full ChatHub application
+# AI Development System - Startup Script
+# This script validates the system and prepares it for use
 
 set -e
 
-echo "🚀 Starting ChatHub Application..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
-# 1. Start Docker services (MongoDB, MinIO)
-echo "📦 Starting Docker containers..."
-docker-compose up -d mongodb minio 2>/dev/null || docker compose up -d mongodb minio
+echo "🤖 AI Development System"
+echo "========================"
+echo ""
 
-# 2. Wait for services to be healthy
-echo "⏳ Waiting for services..."
-sleep 5
+# Check Python
+echo "📦 Checking dependencies..."
+if ! command -v python3 &> /dev/null; then
+    echo "❌ Python 3 is required but not installed."
+    exit 1
+fi
+echo "   ✅ Python 3 found"
 
-# 3. Check Redis
-if ! pgrep -f "redis-server" > /dev/null; then
-    echo "🔴 Redis not running. Starting..."
-    redis-server --daemonize yes 2>/dev/null || echo "⚠️  Please start Redis manually"
+# Check Node.js
+if ! command -v node &> /dev/null; then
+    echo "❌ Node.js is required but not installed."
+    exit 1
+fi
+echo "   ✅ Node.js found"
+
+# Install npm dependencies if needed
+if [ ! -d "node_modules" ]; then
+    echo ""
+    echo "📥 Installing npm dependencies..."
+    npm install
 fi
 
-# 4. Start Backend
-echo "🔧 Starting backend..."
-cd app/backend
-npm run dev &
-BACKEND_PID=$!
-cd ../..
+# Validate system state
+echo ""
+echo "🔍 Validating system state..."
+python3 tools/validate.py all || true
 
-# 5. Wait for backend
-sleep 3
+# Sync state files
+echo ""
+echo "🔄 Synchronizing state..."
+python3 tools/state_sync.py sync
 
-# 6. Start Frontend
-echo "🎨 Starting frontend..."
-cd app/frontend
-npm run dev &
-FRONTEND_PID=$!
-cd ../..
+# Check for PRD files
+echo ""
+echo "📄 Checking PRD files..."
+PRD_COUNT=$(find prd -name "*.prd.md" 2>/dev/null | wc -l)
+if [ "$PRD_COUNT" -eq 0 ]; then
+    echo "   ⚠️  No PRD files found in prd/"
+    echo "   Create a PRD file to start building"
+else
+    echo "   ✅ Found $PRD_COUNT PRD file(s)"
+    find prd -name "*.prd.md" -exec echo "      - {}" \;
+fi
 
 echo ""
-echo "✅ Application started!"
-echo "   Frontend: http://localhost:5173"
-echo "   Backend:  http://localhost:3001"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "Press Ctrl+C to stop all services"
-
-# Wait for processes
-wait
+echo "✅ System ready!"
+echo ""
+echo "📋 Available Commands:"
+echo "   /build-prd            Build from all PRD files"
+echo "   /build-feature        Build a specific feature"
+echo "   /code-review          Run code review"
+echo "   /security-audit       Run security audit"
+echo ""
+echo "🛠️  Python Tools:"
+echo "   python3 tools/parse_prd.py prd/example.prd.md"
+echo "   python3 tools/task_manager.py list"
+echo "   python3 tools/validate.py all"
+echo "   python3 tools/state_sync.py sync"
+echo ""
+echo "📖 Open in VS Code with Copilot to use slash commands"
+echo ""

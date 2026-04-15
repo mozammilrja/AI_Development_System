@@ -1,67 +1,79 @@
 {
-  "$schema": "./schemas/agents.schema.json",
-  "version": "1.0.0",
-  "lastUpdated": null,
+  "version": "2.0.0",
   "agents": {
-    "product-manager": {
+    "team-lead": {
       "status": "idle",
-      "currentTask": null,
-      "lastActivity": null,
-      "completedTasks": 0
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": null
     },
     "architect": {
       "status": "idle",
-      "currentTask": null,
-      "lastActivity": null,
-      "completedTasks": 0
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": "2026-03-16T03:28:34.775173Z",
+      "last_action": "Completed TASK-017"
     },
-    "backend-engineer": {
+    "backend": {
       "status": "idle",
-      "currentTask": null,
-      "lastActivity": null,
-      "completedTasks": 0
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": "2026-03-16T03:28:34.808517Z",
+      "last_action": "Completed TASK-019"
     },
-    "frontend-engineer": {
+    "frontend": {
       "status": "idle",
-      "currentTask": null,
-      "lastActivity": null,
-      "completedTasks": 0
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": "2026-03-16T03:28:34.821851Z",
+      "last_action": "Completed TASK-020"
     },
     "ui-designer": {
       "status": "idle",
-      "currentTask": null,
-      "lastActivity": null,
-      "completedTasks": 0
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": "2026-03-16T03:28:34.797193Z",
+      "last_action": "Completed TASK-021"
     },
-    "devops-engineer": {
+    "database": {
       "status": "idle",
-      "currentTask": null,
-      "lastActivity": null,
-      "completedTasks": 0
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": "2026-03-16T03:28:34.794022Z",
+      "last_action": "Completed TASK-018"
     },
-    "security-engineer": {
+    "devops": {
       "status": "idle",
-      "currentTask": null,
-      "lastActivity": null,
-      "completedTasks": 0
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": null
     },
-    "qa-engineer": {
+    "qa": {
       "status": "idle",
-      "currentTask": null,
-      "lastActivity": null,
-      "completedTasks": 0
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": "2026-03-16T03:28:34.834343Z",
+      "last_action": "Completed TASK-022"
     },
-    "performance-engineer": {
+    "security": {
       "status": "idle",
-      "currentTask": null,
-      "lastActivity": null,
-      "completedTasks": 0
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": "2026-03-16T03:28:34.843848Z",
+      "last_action": "Completed TASK-023"
+    },
+    "performance": {
+      "status": "idle",
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": null
     },
     "reviewer": {
       "status": "idle",
-      "currentTask": null,
-      "lastActivity": null,
-      "completedTasks": 0
+      "current_task": null,
+      "tasks_completed": 0,
+      "last_active": "2026-03-16T03:28:34.848917Z",
+      "last_action": "Completed TASK-024"
     }
   }
 }

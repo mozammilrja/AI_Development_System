@@ -1,13 +1,17 @@
 {
-  "$schema": "./schemas/progress.schema.json",
-  "version": "1.0.0",
-  "lastUpdated": null,
-  "features": [],
-  "summary": {
-    "totalFeatures": 0,
-    "completed": 0,
-    "inProgress": 0,
-    "pending": 0,
-    "blocked": 0
-  }
+  "version": "2.0.0",
+  "builds": [
+    {
+      "id": "BUILD-001",
+      "prd_file": "prd/example.prd.md",
+      "status": "started",
+      "phase": "implementation",
+      "total_tasks": 24,
+      "completed_tasks": 23,
+      "started_at": "2026-03-16T03:28:34.747268Z",
+      "updated_at": "2026-03-16T03:28:34.847666Z",
+      "progress_percent": 95.8
+    }
+  ],
+  "current_build": "BUILD-001"
 }

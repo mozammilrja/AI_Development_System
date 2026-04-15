@@ -1,88 +1,133 @@
-# Agent Definitions
+# AI Agent Team
 
-This directory contains the role definitions for the **parallel multi-agent engineering system**.
+This directory contains the agent definitions for the PRD-driven autonomous development system.
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      TEAM LEAD AGENT                         │
-│  - Receives feature requests                                 │
-│  - Decomposes into tasks                                     │
-│  - Populates shared task list                                │
-│  - Monitors progress                                         │
-└─────────────────────────┬───────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                         TEAM LEAD                                    │
+│  - Reads PRD files from prd/                                        │
+│  - Extracts features and requirements                               │
+│  - Generates development tasks                                       │
+│  - Monitors progress                                                 │
+└─────────────────────────┬───────────────────────────────────────────┘
                           │
                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  SHARED TASK LIST                            │
-│                core/state/tasks.json                         │
-│  - Tasks with status: backlog | claimed | working | completed│
-│  - Agents claim tasks from this file                         │
-└─────────────────────────┬───────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                     SHARED TASK STATE                                │
+│                   core/state/tasks.json                              │
+│                                                                      │
+│  Task States: ready → working → done                                 │
+│  Agents claim tasks from shared state                                │
+└─────────────────────────┬───────────────────────────────────────────┘
                           │
           ┌───────────────┼───────────────┐
-          │               │               │
           ▼               ▼               ▼
 ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
-│   BACKEND   │   │  FRONTEND   │   │     UI      │
-│    AGENT    │   │    AGENT    │   │    AGENT    │
+│  ARCHITECT  │   │  DATABASE   │   │  BACKEND    │
+│             │   │  ENGINEER   │   │  ENGINEER   │
+├─────────────┤   ├─────────────┤   ├─────────────┤
+│  FRONTEND   │   │ UI DESIGNER │   │   DEVOPS    │
+│  ENGINEER   │   │             │   │  ENGINEER   │
 ├─────────────┤   ├─────────────┤   ├─────────────┤
 │     QA      │   │  SECURITY   │   │ PERFORMANCE │
-│    AGENT    │   │    AGENT    │   │    AGENT    │
-├─────────────┤   └─────────────┘   └─────────────┘
-│  REVIEWER   │
-│    AGENT    │
-└─────────────┘
-         ALL AGENTS RUN IN PARALLEL
+│  ENGINEER   │   │  ENGINEER   │   │  ENGINEER   │
+├─────────────┴───┴─────────────┴───┴─────────────┤
+│                    REVIEWER                      │
+└─────────────────────────────────────────────────┘
+              ALL AGENTS RUN IN PARALLEL
 ```
 
-## Agents
+## Agent Roster
 
-| Agent | File | Role |
-|-------|------|------|
-| **Team Lead** | `team-lead.agent.md` | Coordinator, task creation |
-| **Backend** | `backend.agent.md` | APIs, services, database |
-| **Frontend** | `frontend.agent.md` | React components, pages |
-| **UI** | `ui.agent.md` | Design specs, tokens |
-| **QA** | `qa.agent.md` | Tests, quality assurance |
-| **Security** | `security.agent.md` | Security audits |
-| **Performance** | `performance.agent.md` | Benchmarks, optimization |
-| **Reviewer** | `reviewer.agent.md` | Final code review |
+| Agent | File | Role | Task Type |
+|-------|------|------|-----------|
+| **Team Lead** | `team-lead.agent.md` | PRD parsing, task generation | coordinator |
+| **Architect** | `architect.agent.md` | System design | architecture |
+| **Backend** | `backend.agent.md` | APIs, services | backend |
+| **Frontend** | `frontend.agent.md` | React components | frontend |
+| **UI Designer** | `ui-designer.agent.md` | Design system | ui |
+| **Database** | `database.agent.md` | Schema, migrations | database |
+| **DevOps** | `devops.agent.md` | Infrastructure | devops |
+| **QA** | `qa.agent.md` | Testing | testing |
+| **Security** | `security.agent.md` | Security audits | security |
+| **Performance** | `performance.agent.md` | Benchmarks | performance |
+| **Reviewer** | `reviewer.agent.md` | Code review | review |
 
-## Worker Loop
+## Task Flow
 
-All worker agents execute the same loop:
+```
+ready.json ──► Agent Claims ──► working.json ──► Agent Completes ──► done.json
+```
+
+## Worker Agent Protocol
+
+Every worker agent follows this loop:
 
 ```
 1. READ core/state/tasks.json
-2. FIND unclaimed task matching agent type
-3. CLAIM task (set assigned_agent, status="claimed")
-4. WORK on task (set status="working")
-5. COMPLETE task (set status="completed")
-6. REPEAT
+2. FIND task where:
+   - type matches agent specialty
+   - status = "ready"
+   - assigned_agent = null
+   - all dependencies completed
+3. CLAIM task:
+   - SET assigned_agent = "<agent-name>"
+   - SET status = "working"
+4. IMPLEMENT task
+5. COMPLETE task:
+   - SET status = "done"
+   - ADD files created
+6. REPEAT until no matching tasks
 ```
 
-## Parallel Execution
+## Task Dependencies
 
-Agents work **simultaneously**:
-
-- Backend builds API while Frontend builds UI
-- QA writes tests while Security audits code
-- All agents claim tasks independently
-- No agent waits for another unless dependency exists
-
-## Task Schema
-
-```json
-{
-  "task_id": "TASK-XXX",
-  "title": "Task title",
-  "description": "Detailed description",
-  "assigned_agent": null,
-  "status": "backlog | claimed | working | completed",
-  "dependencies": ["TASK-YYY"],
-  "priority": "critical | high | medium | low",
-  "files": []
-}
 ```
+Architecture
+    │
+    ├──► Database ──► Backend ──► Frontend
+    │                    │           │
+    └──► UI Design ──────┴───────────┤
+                                     │
+DevOps ◄─────────────────────────────┤
+                                     │
+QA ◄─────────────────────────────────┤
+                                     │
+Security ◄───────────────────────────┤
+                                     │
+Performance ◄────────────────────────┤
+                                     │
+Review ◄─────────────────────────────┘
+```
+
+## Agent Ownership
+
+| Agent | Owns |
+|-------|------|
+| Architect | `docs/architecture/` |
+| Backend | `services/backend/` |
+| Frontend | `services/frontend/` |
+| UI Designer | `ui/` |
+| Database | `services/backend/migrations/`, `services/backend/src/models/` |
+| DevOps | `platform/`, `.github/workflows/` |
+| QA | `tests/` |
+| Security | `security/` |
+| Performance | `tests/benchmarks/`, `performance/` |
+| Reviewer | `reviews/` |
+
+## Invoking Agents
+
+Agents can be invoked using:
+- `@team-lead` - Start PRD processing
+- `@architect` - Architecture tasks
+- `@backend` - Backend development
+- `@frontend` - Frontend development
+- `@ui-designer` - UI design
+- `@database` - Database tasks
+- `@devops` - Infrastructure tasks
+- `@qa` - Testing tasks
+- `@security` - Security audits
+- `@performance` - Performance testing
+- `@reviewer` - Code review
